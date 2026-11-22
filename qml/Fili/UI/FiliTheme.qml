@@ -42,7 +42,8 @@ QtObject {
     readonly property int sizeSmall: m.size_small
     readonly property int sizeLabel: m.size_label
     readonly property int sizeTitle: m.size_title
-    readonly property int weightAccent: m.weight_accent
+    // Fallback: the theme is read once before the application has set FiliHost.backend (an empty theme gives 0, invalid for a font)
+    readonly property int weightAccent: m.weight_accent || 600
     readonly property int radiusMark: m.radius_mark
     readonly property int radiusControl: m.radius_control
     readonly property int radiusWindow: m.radius_window
