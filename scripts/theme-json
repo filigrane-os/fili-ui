@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+"""Merged theme JSON ({dark, light, accents}) from a theme.toml, as the applications' backends produce it (demo only)."""
+import json, sys, tomllib
+t = tomllib.load(open(sys.argv[1], "rb"))["theme"]
+base = {k: v for k, v in t.items() if not isinstance(v, dict)}
+print(json.dumps({"dark": {**base, **t["dark"]}, "light": {**base, **t["light"]}, "accents": t["accents"]}))

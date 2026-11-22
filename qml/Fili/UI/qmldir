@@ -1,0 +1,9 @@
+module Fili.UI
+singleton FiliHost 1.0 FiliHost.qml
+singleton FiliTheme 1.0 FiliTheme.qml
+FocusRing 1.0 FocusRing.qml
+KineticScroll 1.0 KineticScroll.qml
+FiliScrollBar 1.0 FiliScrollBar.qml
+FiliButton 1.0 FiliButton.qml
+FiliIconButton 1.0 FiliIconButton.qml
+WindowGlyph 1.0 WindowGlyph.qml
