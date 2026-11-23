@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()`.
+- `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()` and `blurField()`.
 
 - `FiliDebugPanel`: the header goes on two lines when the panel is narrow (a drawer): title and filters, then the actions; one line as before when it fits.
 

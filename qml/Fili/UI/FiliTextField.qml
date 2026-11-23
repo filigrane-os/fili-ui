@@ -29,6 +29,8 @@ Rectangle {
     }
     function focusField() { input.forceActiveFocus(); }
     function selectAll() { input.selectAll(); }
+    // Gives up the keyboard focus (Esc in a filter that hands the keys back to the list)
+    function blurField() { input.focus = false; }
 
     TextInput {
         id: input

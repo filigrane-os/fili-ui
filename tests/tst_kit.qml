@@ -312,6 +312,8 @@ Item {
             hdrSearch.text = "abc";
             hdrSearch.focusField();
             hdrSearch.selectAll();
+            hdrSearch.blurField();
+            verify(!hdrSearch.hasFocus);
             hdrSearch.clear();
             compare(hdrSearch.text, "");
         }
