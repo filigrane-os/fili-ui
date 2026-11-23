@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliDebugPanel`: the header goes on two lines when the panel is narrow (a drawer): title and filters, then the actions; one line as before when it fits.
+
 - `FiliIconButton` draws a line icon of the kit when `name` is set (`filled`, `iconSize`, 16 by default), the font glyph otherwise: the toolbar buttons of Facteur, Conversations and Aeroport.
 - `FiliTabBar` items take an `icon` (a FiliIcon name before the label), an `iconColor` and `spin` (the icon turns while the window is active): a command running, a check, a bell.
 

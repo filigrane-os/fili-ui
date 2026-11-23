@@ -117,66 +117,72 @@ Rectangle {
         onReleased: FiliHost.backend.setUiState("debug_height", String(Math.round(panel.panelHeight)))
     }
 
+    // Header: one line when it fits (title and filters on the left, the actions on the right), two when the panel is narrow
+    // (a drawer): the actions then go under the title
     Item {
         id: head
         y: FiliTheme.borderWidth
         width: parent.width
-        height: 30
-        Text {
-            id: title
-            anchors { left: parent.left; leftMargin: FiliTheme.margin; verticalCenter: parent.verticalCenter }
-            text: FiliHost.tr("Debug logs")
-            font.family: FiliTheme.font
-            font.pixelSize: FiliTheme.size
-            font.weight: FiliTheme.weightAccent
-            color: FiliTheme.text
-        }
-        Row {
-            anchors { left: title.right; leftMargin: FiliTheme.space4; verticalCenter: parent.verticalCenter }
+        height: Math.max(30, bar.height + FiliTheme.space1 * 2)
+        Flow {
+            id: bar
+            x: FiliTheme.space3
+            y: Math.max(FiliTheme.space1, (30 - height) / 2)
+            width: parent.width - 2 * FiliTheme.space3
             spacing: FiliTheme.space1
-            Repeater {
-                model: [FiliHost.tr("All"), FiliHost.tr("Warnings"), FiliHost.tr("Errors")]
+            readonly property bool oneLine: left.width + right.width + spacing <= width
+            Row {
+                id: left
+                spacing: FiliTheme.space1
+                Text {
+                    id: title
+                    height: 22
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: FiliTheme.space1
+                    rightPadding: FiliTheme.space2
+                    text: FiliHost.tr("Debug logs")
+                    font.family: FiliTheme.font
+                    font.pixelSize: FiliTheme.size
+                    font.weight: FiliTheme.weightAccent
+                    color: FiliTheme.text
+                }
+                Repeater {
+                    model: [FiliHost.tr("All"), FiliHost.tr("Warnings"), FiliHost.tr("Errors")]
+                    FiliButton {
+                        required property string modelData
+                        required property int index
+                        label: modelData
+                        primary: panel.filter === index
+                        onClicked: panel.filter = index
+                    }
+                }
+            }
+            // Pushes the actions to the right edge while everything fits on one line
+            Item { width: bar.oneLine ? bar.width - left.width - right.width - 2 * bar.spacing : 0; height: 1 }
+            Row {
+                id: right
+                spacing: FiliTheme.space1
+                Text {
+                    height: 22
+                    verticalAlignment: Text.AlignVCenter
+                    text: panel.note !== "" ? panel.note : panel.shown + " " + FiliHost.tr("entries")
+                    font.family: FiliTheme.font
+                    font.pixelSize: FiliTheme.sizeSmall
+                    color: panel.note !== "" ? FiliTheme.accentColor : FiliTheme.muted
+                    rightPadding: FiliTheme.space2
+                }
+                FiliButton { label: FiliHost.tr("Ask Lia"); onClicked: panel.askLia() }
+                FiliButton { label: FiliHost.tr("Copy"); onClicked: panel.copy() }
                 FiliButton {
-                    required property string modelData
-                    required property int index
-                    label: modelData
-                    primary: panel.filter === index
-                    onClicked: panel.filter = index
+                    label: FiliHost.tr("Clear")
+                    onClicked: {
+                        FiliHost.backend.clearLogs();
+                        panel.reset();
+                    }
                 }
+                FiliButton { label: FiliHost.tr("Open file"); onClicked: FiliHost.backend.openPath(FiliHost.backend.logFile()) }
+                FiliButton { label: "×"; onClicked: panel.open = false }
             }
-        }
-        Row {
-            anchors { right: parent.right; rightMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
-            spacing: FiliTheme.space1
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: panel.note !== ""
-                text: panel.note
-                font.family: FiliTheme.font
-                font.pixelSize: FiliTheme.sizeSmall
-                color: FiliTheme.accentColor
-                rightPadding: FiliTheme.space2
-            }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: panel.note === ""
-                text: panel.shown + " " + FiliHost.tr("entries")
-                font.family: FiliTheme.font
-                font.pixelSize: FiliTheme.sizeSmall
-                color: FiliTheme.muted
-                rightPadding: FiliTheme.space2
-            }
-            FiliButton { label: FiliHost.tr("Ask Lia"); onClicked: panel.askLia() }
-            FiliButton { label: FiliHost.tr("Copy"); onClicked: panel.copy() }
-            FiliButton {
-                label: FiliHost.tr("Clear")
-                onClicked: {
-                    FiliHost.backend.clearLogs();
-                    panel.reset();
-                }
-            }
-            FiliButton { label: FiliHost.tr("Open file"); onClicked: FiliHost.backend.openPath(FiliHost.backend.logFile()) }
-            FiliButton { label: "×"; onClicked: panel.open = false }
         }
     }
 
