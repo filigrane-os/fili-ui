@@ -1,4 +1,4 @@
-// Header of a window (44): `leading` (the back/forward capsule), title (`sizeList` over a `sizeSmall` line when there is a second line), `tools` of the view,
+// Header of a window (44): `leading` (the back/forward capsule), title (the capitals on the top edge of the capsule, `sizeList` over a `sizeSmall` line whose baseline is on its bottom edge when there is a second line), `tools` of the view,
 // then the close button at the far right when `closeButton` is on. Background `background`, a 1 px `border` line below. No
 // title bar or menu is drawn in the window: the window title lives in the fili-bar.
 // Children go to `tools` (right, before the close button); `leading` is for what sits left of the title.
@@ -22,30 +22,41 @@ Rectangle {
         anchors { left: parent.left; leftMargin: FiliTheme.margin; verticalCenter: parent.verticalCenter }
         spacing: FiliTheme.space3
     }
-    Column {
+    // The text block is as high as the capsule next to it (30): the capitals of the title start at its top edge and the baseline of
+    // the second line sits on its bottom edge, so the text lines up with the button on the left. Measured with the font (cap height,
+    // baseline), not with line boxes, so it holds for any font of the theme. A title alone is centred.
+    readonly property int blockHeight: 30
+    readonly property bool twoLines: subtitle !== ""
+    // Where the baselines are, in the header (tests); `capHeight` is the height of the tallest letters (capitals and ascenders)
+    readonly property real titleBaseline: block.y + titleText.y + titleText.baselineOffset
+    readonly property real subtitleBaseline: block.y + subtitleText.y + subtitleText.baselineOffset
+    readonly property real capHeight: Math.ceil(titleMetrics.tightBoundingRect("Hl").height)
+    Item {
+        id: block
         anchors { left: leadingRow.right; leftMargin: leadingRow.visibleChildren.length > 0 ? FiliTheme.space3 : 0; right: toolsRow.left; rightMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+        height: h.twoLines ? h.blockHeight : titleText.height
+        FontMetrics { id: titleMetrics; font: titleText.font }
         Text {
+            id: titleText
             width: parent.width
+            y: h.twoLines ? Math.ceil(h.capHeight - baselineOffset) : 0
             text: h.title
             elide: Text.ElideRight
             font.family: FiliTheme.font
-            // A title alone is in `size`; with a second line the pair is `sizeList` + `sizeSmall`, which fits the 44 with air
-            font.pixelSize: h.subtitle !== "" ? FiliTheme.sizeList : FiliTheme.size
+            // A title alone is in `size`; with a second line the pair is `sizeList` + `sizeSmall`
+            font.pixelSize: h.twoLines ? FiliTheme.sizeList : FiliTheme.size
             font.weight: FiliTheme.weightAccent
-            // Fixed line heights: two lines must leave room above and below inside the 44 of the header
-            lineHeightMode: Text.FixedHeight
-            lineHeight: h.subtitle !== "" ? FiliTheme.sizeList + 2 : FiliTheme.size + 3
             color: FiliTheme.text
         }
         Text {
-            visible: h.subtitle !== ""
+            id: subtitleText
+            visible: h.twoLines
             width: parent.width
+            y: h.blockHeight - baselineOffset
             text: h.subtitle
             elide: Text.ElideRight
             font.family: FiliTheme.font
             font.pixelSize: FiliTheme.sizeSmall
-            lineHeightMode: Text.FixedHeight
-            lineHeight: FiliTheme.sizeSmall + 1
             color: FiliTheme.textSecondary
         }
     }

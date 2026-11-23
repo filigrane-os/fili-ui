@@ -52,6 +52,7 @@ Item {
             id: hdr
             width: 480
             title: "Title"
+            subtitle: "Second line"
             closeButton: true
             leading: [FiliNavCapsule { id: hdrNav }]
             FiliIconButton { id: hdrIcon; glyph: "x" }
@@ -246,6 +247,12 @@ Item {
             verify(Math.abs(mid(hdrSearch) - ref) < 1, "search field centre");
             verify(Math.abs(mid(hdrNav) - ref) < 1, "back/forward capsule centre");
             verify(hdrSearch.mapToItem(root, hdrSearch.width, 0).x <= hdr.mapToItem(root, hdr.width - FiliTheme.space3 - 20, 0).x, "room before the close button");
+        }
+        // The text lines up with the capsule on the left: capitals of the title on its top edge, baseline of the second line on its bottom edge
+        function test_header_text_lines_up_with_the_capsule() {
+            const top = hdrNav.mapToItem(hdr, 0, 0).y, bottom = top + hdrNav.height;
+            verify(Math.abs((hdr.titleBaseline - hdr.capHeight) - top) < 1, "title top " + (hdr.titleBaseline - hdr.capHeight) + " vs capsule top " + top);
+            verify(Math.abs(hdr.subtitleBaseline - bottom) < 1, "second line baseline " + hdr.subtitleBaseline + " vs capsule bottom " + bottom);
         }
         function test_dialog_buttons_keys_and_scrim() {
             dlg.open();
