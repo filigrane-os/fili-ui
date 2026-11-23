@@ -70,7 +70,7 @@ Item {
         FiliTextField { id: dlgField; width: parent.width; text: "x" }
     }
     FiliAboutCard { id: aboutCard; appName: "App"; rows: [["Version", "1"]] }
-    FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"]] }] }
+    FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"], ["Space", "A long description that does not fit on one line of the card and must wrap instead of being cut short with an ellipsis at its end, whatever the width"]] }] }
     FiliMenu { id: menu }
     FiliTooltip { id: tooltip }
     FiliPanel { id: panel; settingsPage: "sound"; FiliPanelSection { text: "OUTPUT"; divided: false } }
@@ -384,6 +384,14 @@ Item {
             shortcutsCard.show();
             keyClick(Qt.Key_F1);
             compare(shortcutsCard.visible, false);
+        }
+        function test_long_shortcut_descriptions_wrap_instead_of_being_cut() {
+            shortcutsCard.show();
+            wait(50);
+            const t = findChild(shortcutsCard, "shortcutDescription");
+            verify(t !== null);
+            verify(!t.truncated, "the description is cut");
+            verify(t.lineCount >= 1);
         }
         function test_menu_skips_separators_and_unavailable_entries() {
             menu.open(20, 20, [{ id: "a", label: "A" }, { separator: true }, { id: "b", label: "B", enabled: false }, { id: "c", label: "C", danger: true }]);

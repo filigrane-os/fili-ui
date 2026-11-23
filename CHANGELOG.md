@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliShortcutsCard`: a long description (or key combination) wraps onto several lines instead of being cut with an ellipsis.
+
 - `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()` and `blurField()`.
 
 - `FiliDebugPanel`: the header goes on two lines when the panel is narrow (a drawer): title and filters, then the actions; one line as before when it fits.
