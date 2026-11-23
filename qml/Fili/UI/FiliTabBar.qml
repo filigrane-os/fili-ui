@@ -12,7 +12,8 @@
 //    (`tabDropped(index, drop)`; hovering one for `springDelay` ms selects it, so the target can be chosen in the view).
 // model = [label, …] or [{ label, count, icon, iconColor, spin }, …] (`count`: a muted figure after the label, such as unread
 // messages; `icon`: the name of a FiliIcon shown before the label, in `iconColor` (a colour, `textSecondary` by default), turning
-// while `spin` is true and the window is active: a command running, a conversation loading).
+// while `spin` is true and the window is active: a command running, a conversation loading; `dots`: colours of small discs shown
+// before the label, such as the platforms of a conversation).
 // Tab and Left / Right choose a tab, Return or Space too.
 import QtQuick
 import QtQuick.Window
@@ -51,6 +52,7 @@ Rectangle {
 
     function labelOf(m) { return typeof m === "string" ? m : m.label; }
     function countOf(m) { return typeof m === "string" ? "" : (m.count ?? ""); }
+    function dotsOf(m) { return typeof m === "string" ? [] : (m.dots ?? []); }
     function iconOf(m) { return typeof m === "string" ? "" : (m.icon ?? ""); }
     // Sideways shift of a tab that is not the picked one: it makes room for it
     function shiftOf(i) {
@@ -144,9 +146,19 @@ Rectangle {
                         from: 0; to: 360; duration: 1400; loops: Animation.Infinite
                     }
                 }
+                Row {
+                    id: tabDots
+                    visible: bar.dotsOf(tab.modelData).length > 0
+                    anchors { left: parent.left; leftMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+                    spacing: 2
+                    Repeater {
+                        model: bar.dotsOf(tab.modelData)
+                        Rectangle { required property string modelData; width: 8; height: 8; radius: 4; color: modelData }
+                    }
+                }
                 Text {
                     id: label
-                    anchors { left: tabIcon.visible ? tabIcon.right : parent.left; leftMargin: tabIcon.visible ? FiliTheme.space2 : FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
+                    anchors { left: tabDots.visible ? tabDots.right : tabIcon.visible ? tabIcon.right : parent.left; leftMargin: tabDots.visible || tabIcon.visible ? FiliTheme.space2 : FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
                     text: bar.labelOf(tab.modelData)
                     elide: Text.ElideRight
                     font.family: FiliTheme.font

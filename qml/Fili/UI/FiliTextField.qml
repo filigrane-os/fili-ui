@@ -28,6 +28,7 @@ Rectangle {
         cleared();
     }
     function focusField() { input.forceActiveFocus(); }
+    function selectAll() { input.selectAll(); }
 
     TextInput {
         id: input

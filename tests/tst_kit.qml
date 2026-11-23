@@ -46,7 +46,7 @@ Item {
             }
         }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
-        FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }] }
+        FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }, { label: "D", dots: ["#ff0000", "#00ff00"] }] }
         FiliIconButton { id: lineIcon; name: "search"; filled: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
@@ -304,6 +304,16 @@ Item {
             verify(iconTabs.iconOf(iconTabs.model[1]) === "check");
             verify(iconTabs.iconOf(iconTabs.model[0]) === "");
             verify(iconTabs.iconOf("A") === "");
+        }
+        function test_tab_dots_and_field_selection() {
+            compare(iconTabs.dotsOf(iconTabs.model[3]).length, 2);
+            compare(iconTabs.dotsOf("A").length, 0);
+            compare(iconTabs.dotsOf(iconTabs.model[1]).length, 0);
+            hdrSearch.text = "abc";
+            hdrSearch.focusField();
+            hdrSearch.selectAll();
+            hdrSearch.clear();
+            compare(hdrSearch.text, "");
         }
         function test_icon_button_draws_a_line_icon_or_a_glyph() {
             verify(lineIcon.name === "search");

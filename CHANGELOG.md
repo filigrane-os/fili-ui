@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()`.
+
 - `FiliDebugPanel`: the header goes on two lines when the panel is narrow (a drawer): title and filters, then the actions; one line as before when it fits.
 
 - `FiliIconButton` draws a line icon of the kit when `name` is set (`filled`, `iconSize`, 16 by default), the font glyph otherwise: the toolbar buttons of Facteur, Conversations and Aeroport.
