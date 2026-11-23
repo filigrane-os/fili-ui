@@ -3,7 +3,7 @@
 Shared QML controls and tokens for the Filigrane applications (`fili-*`), following the Filigrane desktop HIG
 (`agents/skills/filigrane-ui/` in the Filigrane repository).
 
-Status: 0.2.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit and `docs/host-contract.md` for what an application gives it.
+Status: 0.3.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit and `docs/host-contract.md` for what an application gives it.
 
 | Part | Components |
 |---|---|

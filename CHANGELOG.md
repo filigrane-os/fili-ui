@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+
+- `FiliTabBar` is the one tab row of every application and a tab can always be moved, closed and detached, the same way everywhere
+  (it merges what Casier, Facteur and Conversations each wrote): drag a tab sideways, it follows the pointer and the others make room
+  (`reordered(from, to)`; Ctrl+Shift+Left / Right on the keyboard); the × on hover and on the current tab, a middle click or Delete
+  closes it (`closeRequested`); dragged far from the bar it turns half transparent and becomes a window (`detachRequested`);
+  right click `contextRequested`; the + button (`addable`, `addRequested`); files dragged over a tab (`tabDropped`, resting on one
+  for `springDelay` selects it); a muted `count` after the label; `closable` and `detachable` to switch a behaviour off.
+- The demo's tab row shows all of it (close, add, detach, move, menu).
+
 ## 0.2.0
 
 The controls and the window anatomy the applications were still writing by hand, from the Filigrane HIG and the application

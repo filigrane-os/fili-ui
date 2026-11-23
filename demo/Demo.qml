@@ -58,6 +58,8 @@ Window {
     readonly property var cli: Qt.application.arguments.slice(1)
     property int tab: { const n = cli.map(Number).filter(v => !isNaN(v) && v >= 0 && v < tabs.length); return n.length ? n[0] : 0; }
     property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
+    readonly property var allTabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
+    readonly property string current: tabs[tab] ?? ""
     Component.onCompleted: {
         if (cli.includes("panel")) { panel.settingsPage = "sound"; panel.openAt(bar); }
         else if (cli.includes("settings")) settings.open("sound");
@@ -112,8 +114,13 @@ Window {
             width: parent.width
             model: win.tabs
             currentIndex: win.tab
+            addable: true
             onTabClicked: i => win.tab = i
             onReordered: (from, to) => { const v = win.tabs.slice(); const t = v.splice(from, 1)[0]; v.splice(to, 0, t); win.tabs = v; win.tab = to; }
+            onCloseRequested: i => { if (win.tabs.length > 1) { const v = win.tabs.slice(); v.splice(i, 1); win.tabs = v; win.tab = Math.min(win.tab >= i && win.tab > 0 ? win.tab - 1 : win.tab, v.length - 1); } }
+            onDetachRequested: i => { backend.lastAction = "detach " + win.tabs[i]; if (win.tabs.length > 1) { const v = win.tabs.slice(); v.splice(i, 1); win.tabs = v; win.tab = Math.min(win.tab, v.length - 1); } }
+            onAddRequested: { const missing = win.allTabs.filter(n => !win.tabs.includes(n)); win.tabs = win.tabs.concat([missing.length ? missing[0] : "New tab"]); win.tab = win.tabs.length - 1; }
+            onContextRequested: (i, x, y) => menu.open(x, y, [{ id: "close", label: "Close tab", danger: true }, { id: "detach", label: "Move tab to new window" }])
         }
         Item {
             width: parent.width
@@ -121,7 +128,7 @@ Window {
             // --- Controls
             Flickable {
                 id: controls
-                visible: win.tab === 0
+                visible: win.current === "Controls"
                 anchors.fill: parent
                 contentHeight: form.height + 2 * FiliTheme.margin
                 clip: true
@@ -248,10 +255,10 @@ Window {
                 }
                 KineticScroll {}
             }
-            FiliScrollBar { visible: win.tab === 0; flick: controls; anchors { top: controls.top; bottom: controls.bottom; right: controls.right } }
+            FiliScrollBar { visible: win.current === "Controls"; flick: controls; anchors { top: controls.top; bottom: controls.bottom; right: controls.right } }
             // --- Colors
             Grid {
-                visible: win.tab === 1
+                visible: win.current === "Colors"
                 x: FiliTheme.margin
                 y: FiliTheme.margin
                 columns: 4
@@ -268,7 +275,7 @@ Window {
             }
             // --- Icons
             Flow {
-                visible: win.tab === 3
+                visible: win.current === "Icons"
                 x: FiliTheme.margin
                 y: FiliTheme.margin
                 width: parent.width - 2 * FiliTheme.margin
@@ -287,7 +294,7 @@ Window {
             }
             // --- Dialogs and menus
             Column {
-                visible: win.tab === 4
+                visible: win.current === "Dialogs"
                 x: FiliTheme.margin
                 y: FiliTheme.margin
                 spacing: FiliTheme.space4
@@ -328,7 +335,7 @@ Window {
             }
             // --- Fili-bar: the tooltip on hover, the panel on click, the settings from its gear
             Column {
-                visible: win.tab === 5
+                visible: win.current === "Fili-bar"
                 width: parent.width
                 Rectangle {
                     id: bar
@@ -400,7 +407,7 @@ Window {
             }
             // --- Type
             Column {
-                visible: win.tab === 2
+                visible: win.current === "Type"
                 x: FiliTheme.margin
                 y: FiliTheme.margin
                 spacing: FiliTheme.space3

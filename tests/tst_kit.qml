@@ -45,7 +45,7 @@ Item {
                 FiliSidebarRow { label: "Pictures" }
             }
         }
-        FiliTabBar { id: tabs; width: 400; model: ["A", "B", "C"] }
+        FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
         FiliHeader {
@@ -86,6 +86,10 @@ Item {
     SignalSpy { id: rowSpy; target: row1; signalName: "clicked" }
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
+    SignalSpy { id: closeSpy; target: tabs; signalName: "closeRequested" }
+    SignalSpy { id: detachSpy; target: tabs; signalName: "detachRequested" }
+    SignalSpy { id: tabCtxSpy; target: tabs; signalName: "contextRequested" }
+    SignalSpy { id: addSpy; target: tabs; signalName: "addRequested" }
     SignalSpy { id: btnSpy; target: btn; signalName: "clicked" }
     SignalSpy { id: dlgAccepted; target: dlg; signalName: "accepted" }
     SignalSpy { id: dlgRejected; target: dlg; signalName: "rejected" }
@@ -100,7 +104,7 @@ Item {
 
         function init() {
             swSpy.clear(); swOffSpy.clear(); cbSpy.clear(); rbSpy.clear(); movedSpy.clear(); stepsSpy.clear();
-            clearedSpy.clear(); viewSpy.clear(); dlgAccepted.clear(); dlgRejected.clear(); menuSpy.clear(); dlg.close(); menu.close(); gearSpy.clear(); settingsClosed.clear(); tooltip.hide(); tooltip.blocked = false; panel.close(); settings.close(); aboutCard.close(); shortcutsCard.close(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
+            clearedSpy.clear(); viewSpy.clear(); dlgAccepted.clear(); dlgRejected.clear(); menuSpy.clear(); dlg.close(); menu.close(); gearSpy.clear(); settingsClosed.clear(); tooltip.hide(); tooltip.blocked = false; panel.close(); settings.close(); aboutCard.close(); shortcutsCard.close(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); closeSpy.clear(); detachSpy.clear(); tabCtxSpy.clear(); addSpy.clear(); tabs.closable = true; tabs.detachable = true; btnSpy.clear();
             tf.text = "";
         }
         function center(item) { return item.mapToItem(root, item.width / 2, item.height / 2); }
@@ -205,22 +209,93 @@ Item {
             mouseClick(root, p.x, p.y);
             compare(rowSpy.count, 1);
         }
-        function test_tabs_click_and_reorder() {
-            // The tabs are the Repeater's items, in the Row (the first child of the bar)
-            const row = tabs.children[0];
-            const t0 = row.children[0], t2 = row.children[2];
-            const c0 = t0.mapToItem(root, t0.width / 2, t0.height / 2), c2 = t2.mapToItem(root, t2.width / 2, t2.height / 2);
-            mouseClick(root, c0.x, c0.y);
+        // The tabs are the Repeater's items in the strip (the first child of the bar)
+        function tabItem(i) { return tabs.children[0].children[i]; }
+        function tabCenter(i) { const t = tabItem(i); return t.mapToItem(root, t.width / 2, t.height / 2); }
+        function test_tabs_click() {
+            const c = tabCenter(1);
+            mouseClick(root, c.x, c.y);
             compare(tabSpy.count, 1);
-            tabSpy.clear();
+            compare(tabSpy.signalArguments[0][0], 1);
+        }
+        function test_tabs_reorder_with_the_others_making_room() {
+            const c0 = tabCenter(0), c2 = tabCenter(2);
             mousePress(root, c0.x, c0.y);
             mouseMove(root, c0.x + 10, c0.y);
             mouseMove(root, c2.x, c2.y);
+            compare(tabs.dragFrom, 0);
+            compare(tabs.dragTo, 2);
+            compare(tabs.shiftOf(1), -tabs.slot, "the tabs it passes shift to make room");
+            compare(tabs.shiftOf(2), -tabs.slot);
             mouseRelease(root, c2.x, c2.y);
             compare(orderSpy.count, 1);
             compare(orderSpy.signalArguments[0][0], 0);
             compare(orderSpy.signalArguments[0][1], 2);
             compare(tabSpy.count, 0, "the release of a drag is not a click");
+            compare(detachSpy.count, 0);
+            compare(tabs.dragFrom, -1);
+        }
+        function test_tab_dragged_far_from_the_bar_is_detached() {
+            const c1 = tabCenter(1);
+            mousePress(root, c1.x, c1.y);
+            mouseMove(root, c1.x + 5, c1.y);
+            mouseMove(root, c1.x + 5, -60);
+            compare(tabs.leaving, true, "half transparent: it will become a window");
+            mouseRelease(root, c1.x + 5, -60);
+            compare(detachSpy.count, 1);
+            compare(detachSpy.signalArguments[0][0], 1);
+            compare(orderSpy.count, 0, "a detached tab is not reordered");
+            compare(tabSpy.count, 0);
+        }
+        function test_a_tab_that_cannot_be_detached_stays() {
+            tabs.detachable = false;
+            const c1 = tabCenter(1);
+            mousePress(root, c1.x, c1.y);
+            mouseMove(root, c1.x + 5, c1.y);
+            mouseMove(root, c1.x + 5, -60);
+            mouseRelease(root, c1.x + 5, -60);
+            compare(detachSpy.count, 0);
+        }
+        function test_tab_close_button_middle_click_and_delete() {
+            // The × shows on the current tab, at its right edge
+            tabs.currentIndex = 0;
+            const t = tabItem(0), x = t.mapToItem(root, t.width - 12, t.height / 2);
+            mouseClick(root, x.x, x.y);
+            compare(closeSpy.count, 1);
+            compare(closeSpy.signalArguments[0][0], 0);
+            const c1 = tabCenter(1);
+            mouseClick(root, c1.x, c1.y, Qt.MiddleButton);
+            compare(closeSpy.count, 2);
+            compare(closeSpy.signalArguments[1][0], 1);
+            tabItem(2).forceActiveFocus();
+            keyClick(Qt.Key_Delete);
+            compare(closeSpy.count, 3);
+            compare(closeSpy.signalArguments[2][0], 2);
+            tabs.closable = false;
+            mouseClick(root, c1.x, c1.y, Qt.MiddleButton);
+            keyClick(Qt.Key_Delete);
+            compare(closeSpy.count, 3, "nothing closes when tabs are not closable");
+        }
+        function test_tab_context_menu_and_add_button() {
+            const c0 = tabCenter(0);
+            mouseClick(root, c0.x, c0.y, Qt.RightButton);
+            compare(tabCtxSpy.count, 1);
+            compare(tabCtxSpy.signalArguments[0][0], 0);
+            const add = tabs.children[0].children[tabs.count + 1];
+            const a = add.mapToItem(root, add.width / 2, add.height / 2);
+            mouseClick(root, a.x, a.y);
+            compare(addSpy.count, 1);
+        }
+        function test_tab_keyboard_moves_chooses_and_reorders() {
+            tabItem(1).forceActiveFocus();
+            keyClick(Qt.Key_Right);
+            compare(tabSpy.signalArguments[tabSpy.count - 1][0], 2);
+            keyClick(Qt.Key_Left);
+            compare(tabSpy.signalArguments[tabSpy.count - 1][0], 0);
+            keyClick(Qt.Key_Right, Qt.ControlModifier | Qt.ShiftModifier);
+            compare(orderSpy.count, 1);
+            compare(orderSpy.signalArguments[0][0], 1);
+            compare(orderSpy.signalArguments[0][1], 2);
         }
         function test_view_switch() {
             // The segments are the capsule's children: list on the left, grid on the right
