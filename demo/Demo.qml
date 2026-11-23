@@ -38,6 +38,7 @@ Window {
     property int tab: 0
     property var tabs: ["Controls", "Colors", "Type"]
     property string place: "Documents"
+    property string view: "list"
 
     FiliHeader {
         id: header
@@ -50,6 +51,7 @@ Window {
         FiliIconButton { glyph: ""; tip: "Previous tab"; hint: "Ctrl+Shift+Tab"; onClicked: if (win.tab > 0) win.tab-- }
         FiliIconButton { glyph: ""; tip: "Next tab"; hint: "Ctrl+Tab"; onClicked: if (win.tab < win.tabs.length - 1) win.tab++ }
         FiliIconButton { glyph: ""; tip: "Disabled"; enabledState: false }
+        FiliViewSwitch { mode: win.view; onChose: m => win.view = m }
         FiliTextField { placeholder: "Search"; clearable: true; width: 180 }
     }
     FiliSidebar {
@@ -122,6 +124,14 @@ Window {
                             FiliButton { label: "Primary"; primary: true }
                             FiliButton { label: "Disabled"; enabledState: false }
                             FiliButton { label: backend.light ? "Dark mode" : "Light mode"; onClicked: backend.light = !backend.light }
+                        }
+                    }
+                    Group {
+                        title: "View switch"
+                        Row {
+                            spacing: FiliTheme.space3
+                            FiliViewSwitch { mode: win.view; onChose: m => win.view = m }
+                            Text { text: "Mode: " + win.view; anchors.verticalCenter: parent.verticalCenter; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.textSecondary }
                         }
                     }
                     Group {

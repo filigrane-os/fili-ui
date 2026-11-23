@@ -46,6 +46,7 @@ Item {
             }
         }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", "C"] }
+        FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
     }
 
@@ -61,6 +62,7 @@ Item {
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
     SignalSpy { id: btnSpy; target: btn; signalName: "clicked" }
+    SignalSpy { id: viewSpy; target: vs; signalName: "chose" }
 
     TestCase {
         name: "kit"
@@ -68,7 +70,7 @@ Item {
 
         function init() {
             swSpy.clear(); swOffSpy.clear(); cbSpy.clear(); rbSpy.clear(); movedSpy.clear(); stepsSpy.clear();
-            clearedSpy.clear(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
+            clearedSpy.clear(); viewSpy.clear(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
             tf.text = "";
         }
         function center(item) { return item.mapToItem(root, item.width / 2, item.height / 2); }
@@ -189,6 +191,23 @@ Item {
             compare(orderSpy.signalArguments[0][0], 0);
             compare(orderSpy.signalArguments[0][1], 2);
             compare(tabSpy.count, 0, "the release of a drag is not a click");
+        }
+        function test_view_switch() {
+            // The segments are the capsule's children: list on the left, grid on the right
+            const grid = vs.children[2];
+            let c = grid.mapToItem(root, grid.width / 2, grid.height / 2);
+            mouseClick(root, c.x, c.y);
+            compare(viewSpy.count, 1);
+            compare(viewSpy.signalArguments[0][0], "grid");
+            compare(vs.mode, "list", "the owner sets the mode, the switch never changes it");
+            const list = vs.children[1];
+            c = list.mapToItem(root, list.width / 2, list.height / 2);
+            mouseClick(root, c.x, c.y);
+            compare(viewSpy.count, 1, "choosing the mode already shown does nothing");
+            vs.forceActiveFocus();
+            keyClick(Qt.Key_Right);
+            compare(viewSpy.count, 2);
+            compare(viewSpy.signalArguments[1][0], "grid");
         }
         function test_button_keyboard() {
             btn.forceActiveFocus();

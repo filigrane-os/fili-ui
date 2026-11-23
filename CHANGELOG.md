@@ -8,7 +8,7 @@ window page (`agents/skills/filigrane-ui/references/app-window.md`).
 - Controls: `FiliSwitch`, `FiliCheckBox`, `FiliRadioButton`, `FiliSlider` (0..1, steps, keyboard), `FiliTextField` (placeholder,
   accent border on focus, × and Esc clear it when `clearable`), `FiliSelect` (list drawn over the whole window, keyboard,
   unavailable choices), `FiliProgressBar` (determinate or indeterminate).
-- Window anatomy: `FiliHeader` (44, title and second line, `leading` / `tools`, close button), `FiliNavCapsule`,
+- Window anatomy: `FiliHeader` (44, title and second line, `leading` / `tools`, close button), `FiliNavCapsule`, `FiliViewSwitch` (the list / icons capsule),
   `FiliSidebar` with `FiliSidebarSection` (foldable header) and `FiliSidebarRow` (glyph or icon, count, selected), `FiliFooter`
   (28, left and right text, error), `FiliTabBar` (40 band, 28 tabs, drag to reorder: `reordered(from, to)`).
 - `FiliHost.keyboard()`: the controls tell the application that the keyboard was used, so the focus ring shows.

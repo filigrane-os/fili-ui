@@ -26,6 +26,7 @@ fn main() {
         "FiliSidebarSection",
         "FiliSidebarRow",
         "FiliTabBar",
+        "FiliViewSwitch",
     ];
     let mut module = QmlModule::new("Fili.UI")
         .qml_file(QmlFile::from("qml/Fili/UI/FiliHost.qml").singleton(true))

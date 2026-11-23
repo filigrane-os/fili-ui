@@ -8,7 +8,7 @@ Status: 0.2.0. See `docs/inventory.md` for what the applications copied by hand 
 | Part | Components |
 |---|---|
 | Tokens, link with the application | `FiliTheme`, `FiliHost` |
-| Buttons | `FiliButton`, `FiliIconButton` |
+| Buttons | `FiliButton`, `FiliIconButton`, `FiliViewSwitch` (list / icons) |
 | Choices | `FiliSwitch`, `FiliCheckBox`, `FiliRadioButton`, `FiliSelect` |
 | Values and fields | `FiliSlider`, `FiliTextField`, `FiliProgressBar` |
 | Window anatomy | `FiliHeader`, `FiliNavCapsule`, `FiliSidebar`, `FiliSidebarSection`, `FiliSidebarRow`, `FiliTabBar`, `FiliFooter` |
