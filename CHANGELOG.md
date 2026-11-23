@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- `FiliIconButton` draws a line icon of the kit when `name` is set (`filled`, `iconSize`, 16 by default), the font glyph otherwise: the toolbar buttons of Facteur, Conversations and Aeroport.
+- `FiliTabBar` items take an `icon` (a FiliIcon name before the label), an `iconColor` and `spin` (the icon turns while the window is active): a command running, a check, a bell.
+
 ## 0.3.0
 
 - `FiliTabBar` is the one tab row of every application and a tab can always be moved, closed and detached, the same way everywhere

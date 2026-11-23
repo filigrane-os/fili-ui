@@ -10,7 +10,9 @@
 //  - detach: drag it far from the bar (it turns half transparent) and release: `detachRequested(index)`, the owner makes a window of it.
 //  - also: `contextRequested(index, x, y)` on right click, `addRequested()` for the + button (`addable`), files dragged over a tab
 //    (`tabDropped(index, drop)`; hovering one for `springDelay` ms selects it, so the target can be chosen in the view).
-// model = [label, …] or [{ label, count }, …] (`count`: a muted figure after the label, such as unread messages).
+// model = [label, …] or [{ label, count, icon, iconColor, spin }, …] (`count`: a muted figure after the label, such as unread
+// messages; `icon`: the name of a FiliIcon shown before the label, in `iconColor` (a colour, `textSecondary` by default), turning
+// while `spin` is true and the window is active: a command running, a conversation loading).
 // Tab and Left / Right choose a tab, Return or Space too.
 import QtQuick
 import QtQuick.Window
@@ -49,6 +51,7 @@ Rectangle {
 
     function labelOf(m) { return typeof m === "string" ? m : m.label; }
     function countOf(m) { return typeof m === "string" ? "" : (m.count ?? ""); }
+    function iconOf(m) { return typeof m === "string" ? "" : (m.icon ?? ""); }
     // Sideways shift of a tab that is not the picked one: it makes room for it
     function shiftOf(i) {
         if (dragFrom < 0 || i === dragFrom)
@@ -129,9 +132,21 @@ Rectangle {
                         onTriggered: bar.tabClicked(tab.index)
                     }
                 }
+                FiliIcon {
+                    id: tabIcon
+                    visible: name !== ""
+                    anchors { left: parent.left; leftMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+                    name: bar.iconOf(tab.modelData)
+                    size: 12
+                    color: typeof tab.modelData === "object" && tab.modelData.iconColor ? tab.modelData.iconColor : FiliTheme.textSecondary
+                    RotationAnimator on rotation {
+                        running: typeof tab.modelData === "object" && !!tab.modelData.spin && !!Window.window && Window.window.active
+                        from: 0; to: 360; duration: 1400; loops: Animation.Infinite
+                    }
+                }
                 Text {
                     id: label
-                    anchors { left: parent.left; leftMargin: FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
+                    anchors { left: tabIcon.visible ? tabIcon.right : parent.left; leftMargin: tabIcon.visible ? FiliTheme.space2 : FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
                     text: bar.labelOf(tab.modelData)
                     elide: Text.ElideRight
                     font.family: FiliTheme.font

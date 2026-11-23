@@ -46,6 +46,8 @@ Item {
             }
         }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
+        FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }] }
+        FiliIconButton { id: lineIcon; name: "search"; filled: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
         FiliHeader {
@@ -296,6 +298,18 @@ Item {
             compare(orderSpy.count, 1);
             compare(orderSpy.signalArguments[0][0], 1);
             compare(orderSpy.signalArguments[0][1], 2);
+        }
+        function test_tab_with_an_icon_shifts_its_label() {
+            waitForRendering(iconTabs);
+            verify(iconTabs.iconOf(iconTabs.model[1]) === "check");
+            verify(iconTabs.iconOf(iconTabs.model[0]) === "");
+            verify(iconTabs.iconOf("A") === "");
+        }
+        function test_icon_button_draws_a_line_icon_or_a_glyph() {
+            verify(lineIcon.name === "search");
+            verify(lineIcon.filled);
+            verify(lineIcon.iconSize === 16);
+            compare(hdrIcon.name, "");
         }
         function test_view_switch() {
             // The segments are the capsule's children: list on the left, grid on the right
