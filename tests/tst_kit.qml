@@ -45,6 +45,7 @@ Item {
                 FiliSidebarRow { label: "Pictures" }
             }
         }
+        FiliLayerRow { id: layerRow; width: 200; label: "Curves"; detail: "80 %"; onVisibilityToggled: shown => layerVisible = shown }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
@@ -84,6 +85,7 @@ Item {
     SignalSpy { id: clearedSpy; target: tf; signalName: "cleared" }
     SignalSpy { id: pickedSpy; target: se; signalName: "picked" }
     SignalSpy { id: rowSpy; target: row1; signalName: "clicked" }
+    SignalSpy { id: layerSpy; target: layerRow; signalName: "clicked" }
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
     SignalSpy { id: closeSpy; target: tabs; signalName: "closeRequested" }
@@ -208,6 +210,17 @@ Item {
             const p = center(row1);
             mouseClick(root, p.x, p.y);
             compare(rowSpy.count, 1);
+        }
+        function test_layer_row_selects_and_its_eye_only_toggles() {
+            layerSpy.clear();
+            layerRow.layerVisible = true;
+            const p = layerRow.mapToItem(root, layerRow.width / 2, layerRow.height / 2);
+            mouseClick(root, p.x, p.y);
+            compare(layerSpy.count, 1, "a click on the row selects");
+            const e = layerRow.mapToItem(root, FiliTheme.margin + 8, layerRow.height / 2);
+            mouseClick(root, e.x, e.y);
+            compare(layerRow.layerVisible, false, "the eye hides the layer");
+            compare(layerSpy.count, 1, "the eye does not select");
         }
         // The tabs are the Repeater's items in the strip (the first child of the bar)
         function tabItem(i) { return tabs.children[0].children[i]; }

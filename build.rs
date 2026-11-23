@@ -25,6 +25,7 @@ fn main() {
         "FiliSidebar",
         "FiliSidebarSection",
         "FiliSidebarRow",
+        "FiliLayerRow",
         "FiliTabBar",
         "FiliViewSwitch",
         "FiliWindowPanel",

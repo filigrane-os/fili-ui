@@ -20,6 +20,7 @@ FiliFooter 1.0 FiliFooter.qml
 FiliSidebar 1.0 FiliSidebar.qml
 FiliSidebarSection 1.0 FiliSidebarSection.qml
 FiliSidebarRow 1.0 FiliSidebarRow.qml
+FiliLayerRow 1.0 FiliLayerRow.qml
 FiliTabBar 1.0 FiliTabBar.qml
 FiliViewSwitch 1.0 FiliViewSwitch.qml
 FiliWindowPanel 1.0 FiliWindowPanel.qml

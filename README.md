@@ -14,8 +14,8 @@ Status: 0.3.0. See `docs/inventory.md` for what the applications copied by hand 
 | Dialogs, menus, cards | `FiliDialog`, `FiliMenu` (context menu with submenus), `FiliAboutCard`, `FiliShortcutsCard` |
 | Window actions, assistant, logs | `FiliWindowPanel`, `FiliLiaButton`, `FiliDebugPanel` |
 | Shell cards | `FiliTooltip` (`FiliTooltipCard`), `FiliPanel` (`FiliPanelSection`, `FiliPanelButton`), `FiliSettings` |
-| Pictures, icons, loader | `FiliIcon` (50 line icons), `FiliAvatar`, `FiliSpinner` (the logo's veils) |
-| Window anatomy | `FiliHeader`, `FiliNavCapsule`, `FiliSidebar`, `FiliSidebarSection`, `FiliSidebarRow`, `FiliTabBar`, `FiliFooter` |
+| Pictures, icons, loader | `FiliIcon` (52 line icons), `FiliAvatar`, `FiliSpinner` (the logo's veils) |
+| Window anatomy | `FiliHeader`, `FiliNavCapsule`, `FiliSidebar`, `FiliSidebarSection`, `FiliSidebarRow`, `FiliLayerRow`, `FiliTabBar`, `FiliFooter` |
 | Scrolling, focus, window actions | `KineticScroll`, `FiliScrollBar`, `FocusRing`, `WindowGlyph` |
 
 ```qml

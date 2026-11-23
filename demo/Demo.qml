@@ -57,6 +57,8 @@ Window {
     // `make demo TAB=5 OPEN=panel`: the tab to start on and a card to open at once (panel, settings, tooltip)
     readonly property var cli: Qt.application.arguments.slice(1)
     property int tab: { const n = cli.map(Number).filter(v => !isNaN(v) && v >= 0 && v < tabs.length); return n.length ? n[0] : 0; }
+    property int layerPicked: 0
+    property var layersShown: [true, true, false]
     property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
     readonly property var allTabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
     readonly property string current: tabs[tab] ?? ""
@@ -105,6 +107,22 @@ Window {
             folded: true
             FiliSidebarRow { label: "Computer" }
             FiliSidebarRow { label: "Trash" }
+        }
+        FiliSidebarSection {
+            title: "Layers"
+            Repeater {
+                model: [{ name: "Curves", detail: "80 %" }, { name: "Title", detail: "" }, { name: "Background", detail: "" }]
+                FiliLayerRow {
+                    required property var modelData
+                    required property int index
+                    label: modelData.name
+                    detail: modelData.detail
+                    selected: win.layerPicked === index
+                    layerVisible: win.layersShown[index]
+                    onClicked: win.layerPicked = index
+                    onVisibilityToggled: shown => { const l = win.layersShown.slice(); l[index] = shown; win.layersShown = l; }
+                }
+            }
         }
     }
     Column {
