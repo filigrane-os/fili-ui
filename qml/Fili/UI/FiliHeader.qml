@@ -1,4 +1,4 @@
-// Header of a window (44): `leading` (the back/forward capsule), title with an optional second line, `tools` of the view,
+// Header of a window (44): `leading` (the back/forward capsule), title (`sizeList` over a `sizeSmall` line when there is a second line), `tools` of the view,
 // then the close button at the far right when `closeButton` is on. Background `background`, a 1 px `border` line below. No
 // title bar or menu is drawn in the window: the window title lives in the fili-bar.
 // Children go to `tools` (right, before the close button); `leading` is for what sits left of the title.
@@ -29,11 +29,12 @@ Rectangle {
             text: h.title
             elide: Text.ElideRight
             font.family: FiliTheme.font
-            font.pixelSize: FiliTheme.size
+            // A title alone is in `size`; with a second line the pair is `sizeList` + `sizeSmall`, which fits the 44 with air
+            font.pixelSize: h.subtitle !== "" ? FiliTheme.sizeList : FiliTheme.size
             font.weight: FiliTheme.weightAccent
             // Fixed line heights: two lines must leave room above and below inside the 44 of the header
             lineHeightMode: Text.FixedHeight
-            lineHeight: FiliTheme.size + 1
+            lineHeight: h.subtitle !== "" ? FiliTheme.sizeList + 2 : FiliTheme.size + 3
             color: FiliTheme.text
         }
         Text {
@@ -42,9 +43,9 @@ Rectangle {
             text: h.subtitle
             elide: Text.ElideRight
             font.family: FiliTheme.font
-            font.pixelSize: FiliTheme.sizeList
+            font.pixelSize: FiliTheme.sizeSmall
             lineHeightMode: Text.FixedHeight
-            lineHeight: FiliTheme.sizeList
+            lineHeight: FiliTheme.sizeSmall + 1
             color: FiliTheme.textSecondary
         }
     }
