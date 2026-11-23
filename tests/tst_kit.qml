@@ -248,11 +248,11 @@ Item {
             verify(Math.abs(mid(hdrNav) - ref) < 1, "back/forward capsule centre");
             verify(hdrSearch.mapToItem(root, hdrSearch.width, 0).x <= hdr.mapToItem(root, hdr.width - FiliTheme.space3 - 20, 0).x, "room before the close button");
         }
-        // The text lines up with the capsule on the left: capitals of the title on its top edge, baseline of the second line on its bottom edge
-        function test_header_text_lines_up_with_the_capsule() {
-            const top = hdrNav.mapToItem(hdr, 0, 0).y, bottom = top + hdrNav.height;
-            verify(Math.abs((hdr.titleBaseline - hdr.capHeight) - top) < 1, "title top " + (hdr.titleBaseline - hdr.capHeight) + " vs capsule top " + top);
-            verify(Math.abs(hdr.subtitleBaseline - bottom) < 1, "second line baseline " + hdr.subtitleBaseline + " vs capsule bottom " + bottom);
+        // The two lines are one block centred in the header: as much room above the capitals of the title as below the baseline of the second line
+        function test_header_text_block_is_centred() {
+            const above = hdr.titleBaseline - hdr.capHeight, below = hdr.height - hdr.subtitleBaseline;
+            verify(Math.abs(above - below) < 1.5, "room above " + above + " vs below " + below);
+            verify(hdr.subtitleBaseline - hdr.titleBaseline < 2 * FiliTheme.sizeList, "the lines are close together");
         }
         function test_dialog_buttons_keys_and_scrim() {
             dlg.open();

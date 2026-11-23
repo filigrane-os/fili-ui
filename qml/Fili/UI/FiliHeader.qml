@@ -1,4 +1,4 @@
-// Header of a window (44): `leading` (the back/forward capsule), title (the capitals on the top edge of the capsule, `sizeList` over a `sizeSmall` line whose baseline is on its bottom edge when there is a second line), `tools` of the view,
+// Header of a window (44): `leading` (the back/forward capsule), title (`sizeList` over a `sizeSmall` line when there is a second line, the pair centred vertically), `tools` of the view,
 // then the close button at the far right when `closeButton` is on. Background `background`, a 1 px `border` line below. No
 // title bar or menu is drawn in the window: the window title lives in the fili-bar.
 // Children go to `tools` (right, before the close button); `leading` is for what sits left of the title.
@@ -22,10 +22,11 @@ Rectangle {
         anchors { left: parent.left; leftMargin: FiliTheme.margin; verticalCenter: parent.verticalCenter }
         spacing: FiliTheme.space3
     }
-    // The text block is as high as the capsule next to it (30): the capitals of the title start at its top edge and the baseline of
-    // the second line sits on its bottom edge, so the text lines up with the button on the left. Measured with the font (cap height,
-    // baseline), not with line boxes, so it holds for any font of the theme. A title alone is centred.
-    readonly property int blockHeight: 30
+    // The two lines are one block, centred vertically in the header: from the top of the tallest letters of the title to the baseline of
+    // the second line, `linePitch` apart (baseline to baseline). Measured with the font (letter height, baseline), not with line
+    // boxes, so it holds for any font of the theme. A title alone is centred too.
+    readonly property int linePitch: FiliTheme.sizeList + 2
+    readonly property real blockHeight: capHeight + linePitch
     readonly property bool twoLines: subtitle !== ""
     // Where the baselines are, in the header (tests); `capHeight` is the height of the tallest letters (capitals and ascenders)
     readonly property real titleBaseline: block.y + titleText.y + titleText.baselineOffset

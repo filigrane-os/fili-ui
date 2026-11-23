@@ -21,7 +21,7 @@ window page (`agents/skills/filigrane-ui/references/app-window.md`).
   95 %, hint line), `FiliPanel` (340 wide, sections, buttons, sliders, switches, a gear to the matching settings page,
   `FiliPanelSection`, `FiliPanelButton`), `FiliSettings` (640 wide: list of pages, the chosen page, close button). The demo's "Fili-bar"
   tab is a bar whose icons show them: hover, click, gear.
-- The text of a two-line header lines up with the capsule on its left: the tallest letters of the title start on the capsule's top edge and the baseline of the second line sits on its bottom edge (measured with the font, checked to the pixel on a capture; a test covers it). The pair is `sizeList` over `sizeSmall`.
+- The two lines of a header are one block centred vertically (title `sizeList` over a `sizeSmall` line, baselines `sizeList + 2` apart), measured with the font so it holds for any theme font; a test covers it.
 - What an application gives these components is listed in `docs/host-contract.md`; `FiliHost.tr()` translates.
 - Components have implicit sizes, and the header lays its tools out in a `RowLayout`: a 30 high capsule and 24 high buttons share one
   centre line, and the tools keep `space3` from the close button (they were top-aligned and 4 px from it). A test covers it.
