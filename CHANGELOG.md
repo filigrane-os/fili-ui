@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliViewSwitch` takes any number of segments (`modes: [{ key, icon, tip }]`, icons of the kit; default still list / grid with drawn pictograms), a hover label per segment and the accent-band tints (`accented`, `ink`): where the reader goes in Facteur (automatic, right, below).
+
 - `FiliTabBar` items take `closable: false` (a fixed tab, such as the categories of a mailbox: no ×, no middle click, no Delete).
 
 - `FiliTextField.secret`: dots instead of the text (passwords), no ×; `readOnly`, `inputMethodHints` and `tabNext` (the field Tab goes to), for the account forms of Facteur.

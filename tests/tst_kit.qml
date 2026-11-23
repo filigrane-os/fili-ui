@@ -51,6 +51,7 @@ Item {
         FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }, { label: "D", dots: ["#ff0000", "#00ff00"] }] }
         FiliIconButton { id: lineIcon; name: "search"; filled: true }
         FiliViewSwitch { id: vs; mode: "list" }
+        FiliViewSwitch { id: vs3; visible: false; mode: "side"; modes: [{ key: "auto", icon: "layout-auto", tip: "Automatic" }, { key: "side", icon: "layout-right", tip: "Right" }, { key: "bottom", icon: "layout-below", tip: "Below" }] }
         FiliButton { id: btn; label: "Go" }
         FiliHeader {
             id: hdr
@@ -354,6 +355,18 @@ Item {
             verify(lineIcon.filled);
             verify(lineIcon.iconSize === 16);
             compare(hdrIcon.name, "");
+        }
+        function test_view_switch_with_three_modes() {
+            compare(vs3.items.length, 3);
+            compare(vs3.implicitWidth, 3 * vs3.segmentWidth + 2 * FiliTheme.space1 + 2);
+            compare(vs3.Accessible.name, "Right");
+            const got = [];
+            vs3.chose.connect(m => got.push(m));
+            vs3.pick("bottom");
+            vs3.step(-1);
+            compare(got.join(","), "bottom,auto", "Left from the current mode goes one segment back");
+            vs3.pick("side");
+            compare(got.length, 2, "the mode already shown does nothing");
         }
         function test_view_switch() {
             // The segments are the capsule's children: list on the left, grid on the right
