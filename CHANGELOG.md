@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `FiliTextField.secret`: dots instead of the text (passwords), no ×.
+
+- `FiliTabBar` scrolls with the wheel when the tabs do not fit (each keeps 80 at least) and keeps the current tab in view (`overflows`, `scrollX`): Facteur's many pinned folders.
+
 - `FiliAvatar` shows its picture: the Canvas never said `imageLoaded` for a picture already read by the probe image, so it stayed hidden behind the initial. Tested with a real picture (`tests/avatar.png`).
 
 - `FiliShortcutsCard`: a long description (or key combination) wraps onto several lines instead of being cut with an ellipsis.

@@ -8,6 +8,7 @@
 //    its model). Keyboard: Ctrl+Shift+Left / Right.
 //  - close: the × that shows on hover and on the current tab, a middle click, or Delete; `closeRequested(index)`.
 //  - detach: drag it far from the bar (it turns half transparent) and release: `detachRequested(index)`, the owner makes a window of it.
+//  - many tabs: below 80 each the row scrolls with the wheel (`overflows`) and keeps the current tab in view.
 //  - also: `contextRequested(index, x, y)` on right click, `addRequested()` for the + button (`addable`), files dragged over a tab
 //    (`tabDropped(index, drop)`; hovering one for `springDelay` ms selects it, so the target can be chosen in the view).
 // model = [label, …] or [{ label, count, icon, iconColor, spin }, …] (`count`: a muted figure after the label, such as unread
@@ -47,6 +48,23 @@ Rectangle {
     readonly property real tabWidth: Math.max(80, Math.min(180, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
     readonly property real slot: tabWidth + FiliTheme.space3
 
+    // More tabs than room (each tab keeps 80 at least): the wheel scrolls the row, and the current tab is brought into view
+    property real scrollX: 0
+    readonly property real viewWidth: width - 2 * FiliTheme.margin
+    readonly property real contentWidth: count * slot + addWidth
+    readonly property bool overflows: contentWidth - FiliTheme.space3 > viewWidth + 0.5
+    function clampScroll(v) { return Math.max(0, Math.min(v, Math.max(0, contentWidth - FiliTheme.space3 - viewWidth))); }
+    function showCurrent() {
+        if (!overflows) { scrollX = 0; return; }
+        const left = currentIndex * slot, right = left + tabWidth;
+        if (left < scrollX) scrollX = clampScroll(left);
+        else if (right > scrollX + viewWidth) scrollX = clampScroll(right - viewWidth);
+        else scrollX = clampScroll(scrollX);
+    }
+    onCurrentIndexChanged: showCurrent()
+    onWidthChanged: showCurrent()
+    onCountChanged: showCurrent()
+
     implicitHeight: FiliTheme.tabBarHeight
     color: FiliTheme.background
 
@@ -71,6 +89,12 @@ Rectangle {
         width: parent.width - 2 * FiliTheme.margin
         height: FiliTheme.tabHeight
         anchors.verticalCenter: parent.verticalCenter
+        clip: bar.overflows && bar.dragFrom < 0
+        WheelHandler {
+            enabled: bar.overflows
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: event => bar.scrollX = bar.clampScroll(bar.scrollX - (event.angleDelta.x !== 0 ? event.angleDelta.x : event.angleDelta.y))
+        }
         Repeater {
             id: rep
             model: bar.model
@@ -80,7 +104,7 @@ Rectangle {
                 required property int index
                 readonly property bool current: index === bar.currentIndex
                 readonly property bool picked: bar.dragFrom === index
-                x: index * bar.slot + (picked ? bar.dragDx : bar.shiftOf(index))
+                x: index * bar.slot - bar.scrollX + (picked ? bar.dragDx : bar.shiftOf(index))
                 width: bar.tabWidth
                 height: FiliTheme.tabHeight
                 radius: FiliTheme.radiusControl
@@ -264,7 +288,7 @@ Rectangle {
         // The + button after the last tab
         Rectangle {
             visible: bar.addable
-            x: bar.count * bar.slot
+            x: bar.count * bar.slot - bar.scrollX
             width: 28
             height: FiliTheme.tabHeight
             radius: FiliTheme.radiusControl

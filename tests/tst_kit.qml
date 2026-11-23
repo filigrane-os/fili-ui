@@ -33,6 +33,8 @@ Item {
         FiliSlider { id: slSteps; width: 200; steps: 4 }
         FiliTextField { id: tf; width: 200; clearable: true; placeholder: "Search" }
         FiliTextField { id: tfPlain; width: 200 }
+        FiliTextField { id: tfSecret; visible: false; width: 200; secret: true; clearable: true; text: "hunter2" }
+        FiliTabBar { id: manyTabs; visible: false; width: 300; model: ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"] }
         FiliSelect { id: se; width: 160; model: [{ label: "One", value: 1 }, { label: "Two", value: 2, off: true }, { label: "Three", value: 3 }]; current: 1 }
         FiliSidebar {
             id: sb
@@ -166,6 +168,24 @@ Item {
             keyClick(Qt.Key_Escape);
             compare(tf.text, "", "Esc clears too");
             compare(clearedSpy.count, 2);
+        }
+        function test_a_secret_field_shows_dots_and_no_clear_button() {
+            const input = tfSecret.children[0];
+            compare(input.echoMode, TextInput.Password);
+            compare(tfSecret.text, "hunter2");
+            compare(tfSecret.children[1].visible, false, "no × on a secret");
+        }
+        function test_many_tabs_scroll_and_keep_the_current_one_in_view() {
+            verify(manyTabs.overflows, "8 tabs of 80 do not fit in 300");
+            compare(manyTabs.scrollX, 0);
+            manyTabs.currentIndex = 7;
+            verify(manyTabs.scrollX > 0, "the last tab is brought into view");
+            verify(manyTabs.scrollX <= manyTabs.contentWidth - manyTabs.viewWidth);
+            manyTabs.currentIndex = 0;
+            compare(manyTabs.scrollX, 0);
+            manyTabs.scrollX = manyTabs.clampScroll(10000);
+            compare(manyTabs.scrollX, manyTabs.clampScroll(1e9), "clamped to the end");
+            manyTabs.scrollX = 0;
         }
         function test_a_plain_field_has_no_clear_button() {
             tfPlain.text = "abc";

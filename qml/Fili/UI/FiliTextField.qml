@@ -9,6 +9,8 @@ Rectangle {
     property bool clearable: false
     property bool enabledState: true
     property bool error: false
+    // Dots instead of the text (passwords); the × stays off
+    property bool secret: false
     readonly property bool hasFocus: input.activeFocus
     signal accepted()
     signal cleared()
@@ -43,6 +45,7 @@ Rectangle {
         selectionColor: FiliTheme.accentColor
         selectedTextColor: FiliTheme.background
         selectByMouse: true
+        echoMode: f.secret ? TextInput.Password : TextInput.Normal
         activeFocusOnTab: true
         onAccepted: f.accepted()
         Keys.onEscapePressed: e => {
@@ -61,7 +64,7 @@ Rectangle {
     }
     Text {
         id: x
-        visible: f.clearable && input.text !== ""
+        visible: f.clearable && !f.secret && input.text !== ""
         anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
         text: "✕"
         font.pixelSize: FiliTheme.sizeSmall
