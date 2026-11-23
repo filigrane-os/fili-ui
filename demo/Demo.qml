@@ -54,8 +54,15 @@ Window {
     function showTip(item, text) { tip.text = text; }
     function hideTip(item) { tip.text = ""; }
 
-    property int tab: Number(Qt.application.arguments[Qt.application.arguments.length - 1]) >= 0 ? Number(Qt.application.arguments[Qt.application.arguments.length - 1]) : 0
-    property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs"]
+    // `make demo TAB=5 OPEN=panel`: the tab to start on and a card to open at once (panel, settings, tooltip)
+    readonly property var cli: Qt.application.arguments.slice(1)
+    property int tab: { const n = cli.map(Number).filter(v => !isNaN(v) && v >= 0 && v < tabs.length); return n.length ? n[0] : 0; }
+    property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
+    Component.onCompleted: {
+        if (cli.includes("panel")) { panel.settingsPage = "sound"; panel.openAt(bar); }
+        else if (cli.includes("settings")) settings.open("sound");
+        else if (cli.includes("tooltip")) tooltip.show(bar, { title: "Sound", rows: [["Output", "Built-in speakers"], ["Volume", "42 %", { value: 0.42, mark: 0.5 }]], hint: "Click: panel · Right click: menu" });
+    }
     property string place: "Documents"
     property string view: "list"
 
@@ -319,6 +326,78 @@ Window {
                     }
                 }
             }
+            // --- Fili-bar: the tooltip on hover, the panel on click, the settings from its gear
+            Column {
+                visible: win.tab === 5
+                width: parent.width
+                Rectangle {
+                    id: bar
+                    width: parent.width
+                    height: 34
+                    color: FiliTheme.backgroundDeep
+                    Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: FiliTheme.borderWidth; color: FiliTheme.border }
+                    Text { anchors { left: parent.left; leftMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter } text: "Filigrane"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; font.weight: FiliTheme.weightAccent; color: FiliTheme.text }
+                    Row {
+                        anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
+                        Repeater {
+                            model: [
+                                { glyph: "\uf028", value: "42", page: "sound", card: { title: "Sound", rows: [["Output", "Built-in speakers"], ["Volume", "42 %", { value: 0.42, mark: 0.5 }]], hint: "Click: panel · Right click: menu" } },
+                                { glyph: "\uf1eb", value: "", page: "network", card: { title: "Network", rows: [["Wi-Fi", "Filigrane-5G"], ["Signal", "78 %", { value: 0.78 }], ["Download", "12.4 MB/s"]], hint: "Click: panel" } },
+                                { glyph: "\uf293", value: "", page: "bluetooth", card: { title: "Bluetooth", text: "2 devices connected", hint: "Click: panel" } },
+                                { glyph: "\uf240", value: "92", page: "power", card: { title: "Battery", rows: [["Level", "92 %", { value: 0.92, mark: 0.8 }], ["Time left", "5 h 12 min"]], hint: "Click: panel" } },
+                                { glyph: "\uf0f3", value: "", page: "notifications", card: { text: "No new notification" } }
+                            ]
+                            Item {
+                                id: mod
+                                required property var modelData
+                                width: row.implicitWidth + 2 * FiliTheme.space2
+                                height: 34
+                                Rectangle { anchors { fill: parent; topMargin: 3; bottomMargin: 3 } radius: FiliTheme.radiusControl; color: modArea.containsMouse || (panel.opened && panel.item === mod) ? FiliTheme.surfaceHover : "transparent" }
+                                Row {
+                                    id: row
+                                    anchors.centerIn: parent
+                                    spacing: FiliTheme.space1
+                                    Text { text: mod.modelData.glyph; font.family: FiliTheme.icons; font.pixelSize: FiliTheme.size; color: FiliTheme.muted; anchors.verticalCenter: parent.verticalCenter }
+                                    Text { visible: mod.modelData.value !== ""; text: mod.modelData.value; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.text; anchors.verticalCenter: parent.verticalCenter }
+                                }
+                                MouseArea {
+                                    id: modArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onContainsMouseChanged: containsMouse ? tooltip.show(mod, mod.modelData.card) : tooltip.hide(mod)
+                                    onClicked: { tooltip.hide(mod); panel.settingsPage = mod.modelData.page; panel.toggle(mod); }
+                                }
+                            }
+                        }
+                        Item {
+                            id: clock
+                            width: clockText.implicitWidth + 2 * FiliTheme.space2
+                            height: 34
+                            Text { id: clockText; anchors.centerIn: parent; text: "Sun 23 Nov  10:42"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.text }
+                            MouseArea { anchors.fill: parent; hoverEnabled: true; onContainsMouseChanged: containsMouse ? tooltip.show(clock, { title: "Sunday", text: "23 November 2026", hint: "Click: calendar" }) : tooltip.hide(clock) }
+                        }
+                    }
+                }
+                Column {
+                    x: FiliTheme.margin
+                    width: parent.width - 2 * FiliTheme.margin
+                    topPadding: FiliTheme.margin
+                    spacing: FiliTheme.space3
+                    Text { text: "The three cards of the fili-shell"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeSmall; font.weight: FiliTheme.weightAccent; color: FiliTheme.muted }
+                    Text { width: parent.width; wrapMode: Text.Wrap; text: "Hover an icon of the bar above: the tooltip opens under it after 400 ms (read-only, the actions stay on the clicks). Click an icon: the panel opens under it (340 wide, Esc or a click elsewhere closes it, the same icon again too). The gear at its top right opens the settings window on the matching page (640 wide, Esc or the cross closes it)."; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+                    Row {
+                        spacing: FiliTheme.space2
+                        FiliButton { label: "Open the panel"; onClicked: { panel.settingsPage = "sound"; panel.openAt(bar); } }
+                        FiliButton { label: "Open the settings"; onClicked: settings.open("sound") }
+                    }
+                    Text { text: "The tooltip card on its own"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeSmall; font.weight: FiliTheme.weightAccent; color: FiliTheme.muted; topPadding: FiliTheme.space3 }
+                    Row {
+                        spacing: FiliTheme.space4
+                        FiliTooltipCard { title: "Sound"; rows: [["Output", "Built-in speakers"], ["Volume", "86 %", { value: 0.86, mark: 0.5 }], ["Peak", "97 %", { value: 0.97 }]]; hint: "Click: panel · Right click: menu" }
+                        FiliTooltipCard { text: "A one line card"; }
+                    }
+                }
+            }
             // --- Type
             Column {
                 visible: win.tab === 2
@@ -385,5 +464,46 @@ Window {
     FiliShortcutsCard {
         id: shortcuts
         groups: [{ title: "Moving around", rows: [["Alt+←  Alt+→", "Back / forward"], ["Ctrl+F  /", "Search"], ["Ctrl+Shift+W", "Window actions"]] }, { title: "List", rows: [["↑ ↓", "Move"], ["Enter", "Open"], ["Ctrl+A", "Select all"]] }]
+    }
+    FiliTooltip {
+        id: tooltip
+        blocked: panel.opened || settings.opened
+    }
+    FiliPanel {
+        id: panel
+        onSettingsRequested: page => settings.open(page)
+        FiliPanelSection { text: "OUTPUT"; divided: false; width: parent.width }
+        FiliSlider { width: parent.width; showValue: true; to: 100; value: 0.42; onMoved: v => value = v }
+        FiliPanelButton { glyph: "\uf028"; label: "Built-in speakers"; detail: "Default"; sel: true; width: parent.width }
+        FiliPanelButton { glyph: "\uf028"; label: "Headphones"; detail: "Not connected"; dim: true; width: parent.width }
+        FiliPanelSection { text: "OPTIONS"; width: parent.width }
+        Row {
+            spacing: FiliTheme.space2
+            FiliSwitch { checked: sw3.on; onToggled: sw3.on = !sw3.on; QtObject { id: sw3; property bool on: false } }
+            Text { text: "Mute"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.text; anchors.verticalCenter: parent.verticalCenter }
+        }
+    }
+    FiliSettings {
+        id: settings
+        pages: [{ id: "display", label: "Display" }, { id: "sound", label: "Sound" }, { id: "network", label: "Network" }, { id: "appearance", label: "Appearance" }, { id: "about", label: "About" }]
+        page: "sound"
+        Column {
+            visible: settings.page === "sound"
+            width: parent.width
+            spacing: FiliTheme.space3
+            Text { text: "Sound"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeTitle; font.weight: FiliTheme.weightAccent; color: FiliTheme.text }
+            FiliPanelSection { text: "OUTPUT"; divided: false; width: parent.width }
+            FiliSelect { width: 220; placeholder: "Device"; current: 1; model: [{ label: "Built-in speakers", value: 1 }, { label: "Headphones", value: 2, off: true }] }
+            FiliPanelSection { text: "VOLUME"; width: parent.width }
+            FiliSlider { width: 320; showValue: true; to: 100; value: 0.42; onMoved: v => value = v }
+            FiliCheckBox { label: "Raise the volume above 100 %"; checked: false; onToggled: checked = !checked }
+        }
+        Column {
+            visible: settings.page !== "sound"
+            width: parent.width
+            spacing: FiliTheme.space3
+            Text { text: settings.pages.find(p => p.id === settings.page).label; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeTitle; font.weight: FiliTheme.weightAccent; color: FiliTheme.text }
+            Text { width: parent.width; wrapMode: Text.Wrap; text: "The page of this module: what is set once. The frequent settings stay in its panel."; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+        }
     }
 }

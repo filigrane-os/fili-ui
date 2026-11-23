@@ -37,6 +37,12 @@ fn main() {
         "FiliAboutCard",
         "FiliShortcutsCard",
         "FiliAvatar",
+        "FiliTooltipCard",
+        "FiliTooltip",
+        "FiliPanelSection",
+        "FiliPanelButton",
+        "FiliPanel",
+        "FiliSettings",
     ];
     let mut module = QmlModule::new("Fili.UI")
         .qml_file(QmlFile::from("qml/Fili/UI/FiliHost.qml").singleton(true))

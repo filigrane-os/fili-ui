@@ -69,6 +69,10 @@ Item {
     FiliAboutCard { id: aboutCard; appName: "App"; rows: [["Version", "1"]] }
     FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"]] }] }
     FiliMenu { id: menu }
+    FiliTooltip { id: tooltip }
+    FiliPanel { id: panel; settingsPage: "sound"; FiliPanelSection { text: "OUTPUT"; divided: false } }
+    FiliSettings { id: settings; pages: [{ id: "a", label: "A" }, { id: "b", label: "B" }]; Text { text: "page" } }
+    Item { id: anchorItem; x: 200; y: 40; width: 30; height: 30 }
 
     SignalSpy { id: swSpy; target: sw; signalName: "toggled" }
     SignalSpy { id: swOffSpy; target: swOff; signalName: "toggled" }
@@ -85,6 +89,8 @@ Item {
     SignalSpy { id: dlgAccepted; target: dlg; signalName: "accepted" }
     SignalSpy { id: dlgRejected; target: dlg; signalName: "rejected" }
     SignalSpy { id: menuSpy; target: menu; signalName: "activated" }
+    SignalSpy { id: gearSpy; target: panel; signalName: "settingsRequested" }
+    SignalSpy { id: settingsClosed; target: settings; signalName: "closed" }
     SignalSpy { id: viewSpy; target: vs; signalName: "chose" }
 
     TestCase {
@@ -93,7 +99,7 @@ Item {
 
         function init() {
             swSpy.clear(); swOffSpy.clear(); cbSpy.clear(); rbSpy.clear(); movedSpy.clear(); stepsSpy.clear();
-            clearedSpy.clear(); viewSpy.clear(); dlgAccepted.clear(); dlgRejected.clear(); menuSpy.clear(); dlg.close(); menu.close(); aboutCard.close(); shortcutsCard.close(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
+            clearedSpy.clear(); viewSpy.clear(); dlgAccepted.clear(); dlgRejected.clear(); menuSpy.clear(); dlg.close(); menu.close(); gearSpy.clear(); settingsClosed.clear(); tooltip.hide(); tooltip.blocked = false; panel.close(); settings.close(); aboutCard.close(); shortcutsCard.close(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
             tf.text = "";
         }
         function center(item) { return item.mapToItem(root, item.width / 2, item.height / 2); }
@@ -306,6 +312,54 @@ Item {
         }
         function test_avatar_without_a_picture_shows_the_initial() {
             compare(avatar.loaded, false);
+        }
+        function test_tooltip_opens_after_a_delay_and_not_when_blocked() {
+            tooltip.show(anchorItem, { title: "T", text: "x" });
+            compare(tooltip.shown, false, "not at once");
+            tryCompare(tooltip, "shown", true, 1500);
+            tooltip.hide(anchorItem);
+            compare(tooltip.shown, false);
+            tooltip.blocked = true;
+            tooltip.show(anchorItem, { title: "T", text: "x" });
+            wait(550);
+            compare(tooltip.shown, false, "nothing while a panel is open");
+            tooltip.blocked = false;
+            tooltip.show(anchorItem, {});
+            wait(550);
+            compare(tooltip.shown, false, "an empty card is never shown");
+        }
+        function test_panel_toggles_and_closes_with_esc() {
+            panel.toggle(anchorItem);
+            compare(panel.opened, true);
+            panel.toggle(anchorItem);
+            compare(panel.opened, false, "the same item again closes it");
+            panel.openAt(anchorItem);
+            keyClick(Qt.Key_Escape);
+            compare(panel.opened, false);
+        }
+        function test_panel_gear_opens_the_settings_page() {
+            panel.openAt(anchorItem);
+            const card = panel.children[1];
+            const g = card.mapToItem(root, card.width - 14, 14);
+            mouseClick(root, g.x, g.y);
+            compare(gearSpy.count, 1);
+            compare(gearSpy.signalArguments[0][0], "sound");
+            compare(panel.opened, false, "the panel closes first");
+        }
+        function test_panel_click_elsewhere_closes() {
+            panel.openAt(anchorItem);
+            mouseClick(root, 2, root.height - 2);
+            compare(panel.opened, false);
+        }
+        function test_settings_pages_and_esc() {
+            settings.open("b");
+            compare(settings.opened, true);
+            compare(settings.page, "b");
+            settings.open("unknown");
+            compare(settings.page, "b", "an unknown page keeps the current one");
+            keyClick(Qt.Key_Escape);
+            compare(settings.opened, false);
+            compare(settingsClosed.count, 1);
         }
         function test_button_keyboard() {
             btn.forceActiveFocus();

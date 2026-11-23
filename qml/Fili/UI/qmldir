@@ -32,3 +32,9 @@ FiliAboutCard 1.0 FiliAboutCard.qml
 FiliShortcutsCard 1.0 FiliShortcutsCard.qml
 FiliAvatar 1.0 FiliAvatar.qml
 FiliIcon 1.0 FiliIcon.qml
+FiliTooltipCard 1.0 FiliTooltipCard.qml
+FiliTooltip 1.0 FiliTooltip.qml
+FiliPanelSection 1.0 FiliPanelSection.qml
+FiliPanelButton 1.0 FiliPanelButton.qml
+FiliPanel 1.0 FiliPanel.qml
+FiliSettings 1.0 FiliSettings.qml

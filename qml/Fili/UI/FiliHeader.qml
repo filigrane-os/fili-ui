@@ -31,6 +31,9 @@ Rectangle {
             font.family: FiliTheme.font
             font.pixelSize: FiliTheme.size
             font.weight: FiliTheme.weightAccent
+            // Fixed line heights: two lines must leave room above and below inside the 44 of the header
+            lineHeightMode: Text.FixedHeight
+            lineHeight: FiliTheme.size + 1
             color: FiliTheme.text
         }
         Text {
@@ -40,6 +43,8 @@ Rectangle {
             elide: Text.ElideRight
             font.family: FiliTheme.font
             font.pixelSize: FiliTheme.sizeList
+            lineHeightMode: Text.FixedHeight
+            lineHeight: FiliTheme.sizeList
             color: FiliTheme.textSecondary
         }
     }
