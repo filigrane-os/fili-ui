@@ -3,7 +3,7 @@
 Shared QML controls and tokens for the Filigrane applications (`fili-*`), following the Filigrane desktop HIG
 (`agents/skills/filigrane-ui/` in the Filigrane repository).
 
-Status: 0.2.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit.
+Status: 0.2.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit and `docs/host-contract.md` for what an application gives it.
 
 | Part | Components |
 |---|---|
@@ -11,6 +11,9 @@ Status: 0.2.0. See `docs/inventory.md` for what the applications copied by hand 
 | Buttons | `FiliButton`, `FiliIconButton`, `FiliViewSwitch` (list / icons) |
 | Choices | `FiliSwitch`, `FiliCheckBox`, `FiliRadioButton`, `FiliSelect` |
 | Values and fields | `FiliSlider`, `FiliTextField`, `FiliProgressBar` |
+| Dialogs, menus, cards | `FiliDialog`, `FiliMenu` (context menu with submenus), `FiliAboutCard`, `FiliShortcutsCard` |
+| Window actions, assistant, logs | `FiliWindowPanel`, `FiliLiaButton`, `FiliDebugPanel` |
+| Pictures, icons, loader | `FiliIcon` (49 line icons), `FiliAvatar`, `FiliSpinner` (the logo's veils) |
 | Window anatomy | `FiliHeader`, `FiliNavCapsule`, `FiliSidebar`, `FiliSidebarSection`, `FiliSidebarRow`, `FiliTabBar`, `FiliFooter` |
 | Scrolling, focus, window actions | `KineticScroll`, `FiliScrollBar`, `FocusRing`, `WindowGlyph` |
 
@@ -31,7 +34,7 @@ first tokens are 0 and a `ListView` does not move again when its `leftMargin` ch
 list of Casier shifted by a few pixels). Declare the assignment as the first property of the root item.
 
 - `make check`: lint, demo theme in sync with `demo/theme.toml`, the headless behaviour tests (`scripts/run-tests.sh`).
-- `make demo`: the kit as a whole window (`demo/Demo.qml`): header, sidebar, tabs, footer, every control, the tokens and the type scale.
+- `make demo` (`make demo TAB=3` opens a given tab): the kit as a whole window (`demo/Demo.qml`): header, sidebar, tabs, footer, every control, the tokens, the type scale, the icons, the dialogs and menus.
 
 No component uses a shader effect (`MultiEffect`, `ShaderEffect`…): the Filigrane session renders Qt Quick in software, where they draw
 nothing. The tests refuse them.

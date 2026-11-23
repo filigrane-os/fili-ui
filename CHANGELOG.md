@@ -11,10 +11,18 @@ window page (`agents/skills/filigrane-ui/references/app-window.md`).
 - Window anatomy: `FiliHeader` (44, title and second line, `leading` / `tools`, close button), `FiliNavCapsule`, `FiliViewSwitch` (the list / icons capsule),
   `FiliSidebar` with `FiliSidebarSection` (foldable header) and `FiliSidebarRow` (glyph or icon, count, selected), `FiliFooter`
   (28, left and right text, error), `FiliTabBar` (40 band, 28 tabs, drag to reorder: `reordered(from, to)`).
+- From the other applications (Facteur, Conversations, Aeroport, Baladeur, Cassette, Lia), where each kept its own copy:
+  `FiliDialog` (the modal card: title, content, Cancel and the main action), `FiliMenu` (context menu: separators, shortcuts, check
+  marks, submenus, unavailable and `danger` entries, width fitted to the longest label), `FiliAboutCard`, `FiliShortcutsCard`,
+  `FiliWindowPanel` (niri's window actions), `FiliLiaButton`, `FiliDebugPanel` (the log panel), `FiliIcon` (the 49 line icons of the
+  three apps that had one), `FiliSpinner` (the logo's veils), `FiliAvatar` (round picture drawn without a shader mask).
+- What an application gives these components is listed in `docs/host-contract.md`; `FiliHost.tr()` translates.
+- Components have implicit sizes, and the header lays its tools out in a `RowLayout`: a 30 high capsule and 24 high buttons share one
+  centre line, and the tools keep `space3` from the close button (they were top-aligned and 4 px from it). A test covers it.
 - `FiliHost.keyboard()`: the controls tell the application that the keyboard was used, so the focus ring shows.
 - Demo (`make demo`) is now a whole window with every part and control, a Colors page (the tokens) and a Type page, with the
   Jost and Fili Icons fonts it ships (licenses next to them).
-- Behaviour tests (`scripts/run-tests.sh`, run by `make check`): 12 headless tests of the controls, the sidebar and the tabs, and
+- Behaviour tests (`scripts/run-tests.sh`, run by `make check`): 21 headless tests of the controls, the sidebar and the tabs, and
   a guard against shader effects (the Filigrane session renders in software, where they draw nothing).
 
 ## 0.1.0

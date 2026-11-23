@@ -48,7 +48,27 @@ Item {
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", "C"] }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
+        FiliHeader {
+            id: hdr
+            width: 480
+            title: "Title"
+            closeButton: true
+            leading: [FiliNavCapsule { id: hdrNav }]
+            FiliIconButton { id: hdrIcon; glyph: "x" }
+            FiliViewSwitch { id: hdrView }
+            FiliTextField { id: hdrSearch; clearable: true }
+        }
+        FiliIcon { id: ico; name: "x"; size: 24; color: "#ffffff" }
+        FiliAvatar { id: avatar; name: "Ada" }
     }
+    FiliDialog {
+        id: dlg
+        title: "Rename"
+        FiliTextField { id: dlgField; width: parent.width; text: "x" }
+    }
+    FiliAboutCard { id: aboutCard; appName: "App"; rows: [["Version", "1"]] }
+    FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"]] }] }
+    FiliMenu { id: menu }
 
     SignalSpy { id: swSpy; target: sw; signalName: "toggled" }
     SignalSpy { id: swOffSpy; target: swOff; signalName: "toggled" }
@@ -62,6 +82,9 @@ Item {
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
     SignalSpy { id: btnSpy; target: btn; signalName: "clicked" }
+    SignalSpy { id: dlgAccepted; target: dlg; signalName: "accepted" }
+    SignalSpy { id: dlgRejected; target: dlg; signalName: "rejected" }
+    SignalSpy { id: menuSpy; target: menu; signalName: "activated" }
     SignalSpy { id: viewSpy; target: vs; signalName: "chose" }
 
     TestCase {
@@ -70,7 +93,7 @@ Item {
 
         function init() {
             swSpy.clear(); swOffSpy.clear(); cbSpy.clear(); rbSpy.clear(); movedSpy.clear(); stepsSpy.clear();
-            clearedSpy.clear(); viewSpy.clear(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
+            clearedSpy.clear(); viewSpy.clear(); dlgAccepted.clear(); dlgRejected.clear(); menuSpy.clear(); dlg.close(); menu.close(); aboutCard.close(); shortcutsCard.close(); pickedSpy.clear(); rowSpy.clear(); tabSpy.clear(); orderSpy.clear(); btnSpy.clear();
             tf.text = "";
         }
         function center(item) { return item.mapToItem(root, item.width / 2, item.height / 2); }
@@ -208,6 +231,81 @@ Item {
             keyClick(Qt.Key_Right);
             compare(viewSpy.count, 2);
             compare(viewSpy.signalArguments[1][0], "grid");
+        }
+        // The bug that was seen: a capsule of 30 beside buttons of 24 must share one centre line, not one top edge
+        function test_header_tools_share_a_centre_line() {
+            const mid = item => item.mapToItem(root, 0, item.height / 2).y;
+            const ref = mid(hdrView);
+            verify(Math.abs(mid(hdrIcon) - ref) < 1, "icon button centre " + mid(hdrIcon) + " vs " + ref);
+            verify(Math.abs(mid(hdrSearch) - ref) < 1, "search field centre");
+            verify(Math.abs(mid(hdrNav) - ref) < 1, "back/forward capsule centre");
+            verify(hdrSearch.mapToItem(root, hdrSearch.width, 0).x <= hdr.mapToItem(root, hdr.width - FiliTheme.space3 - 20, 0).x, "room before the close button");
+        }
+        function test_dialog_buttons_keys_and_scrim() {
+            dlg.open();
+            compare(dlg.visible, true);
+            keyClick(Qt.Key_Escape);
+            compare(dlg.visible, false);
+            compare(dlgRejected.count, 1);
+            dlg.open();
+            keyClick(Qt.Key_Return);
+            compare(dlgAccepted.count, 1);
+            compare(dlg.visible, false);
+            dlg.confirmEnabled = false;
+            dlg.open();
+            keyClick(Qt.Key_Return);
+            compare(dlgAccepted.count, 1, "Enter does nothing while the main action is unavailable");
+            compare(dlg.visible, true);
+            dlg.confirmEnabled = true;
+            mouseClick(root, 2, root.height - 2);
+            compare(dlg.visible, false);
+            compare(dlgRejected.count, 2, "a click on the scrim rejects");
+        }
+        function test_information_cards_close_with_the_keys_they_name() {
+            aboutCard.show();
+            compare(aboutCard.visible, true);
+            keyClick(Qt.Key_Return);
+            compare(aboutCard.visible, false);
+            compare(dlgAccepted.count, 0);
+            shortcutsCard.show();
+            keyClick(Qt.Key_F1);
+            compare(shortcutsCard.visible, false);
+        }
+        function test_menu_skips_separators_and_unavailable_entries() {
+            menu.open(20, 20, [{ id: "a", label: "A" }, { separator: true }, { id: "b", label: "B", enabled: false }, { id: "c", label: "C", danger: true }]);
+            compare(menu.visible, true);
+            keyClick(Qt.Key_Down);
+            compare(menu.current, 0);
+            keyClick(Qt.Key_Down);
+            compare(menu.current, 3, "the separator and the unavailable B are skipped");
+            keyClick(Qt.Key_Return);
+            compare(menuSpy.count, 1);
+            compare(menuSpy.signalArguments[0][0], "c");
+            compare(menu.visible, false);
+        }
+        function test_menu_submenu_and_escape() {
+            menu.openAt(20, 20, [{ id: "m", label: "More", children: [{ id: "x", label: "X" }, { id: "y", label: "Y" }] }]);
+            keyClick(Qt.Key_Down);
+            keyClick(Qt.Key_Right);
+            compare(menu.subOpen, true);
+            keyClick(Qt.Key_Down);
+            keyClick(Qt.Key_Return);
+            compare(menuSpy.signalArguments[0][0], "y");
+            menu.openAt(20, 20, [{ id: "z", label: "Z" }]);
+            keyClick(Qt.Key_Escape);
+            compare(menu.visible, false);
+            compare(menuSpy.count, 1, "Esc chooses nothing");
+        }
+        // Drawn by Shapes: it must show under the software renderer of the Filigrane session too
+        function test_icon_is_drawn() {
+            wait(100);
+            const g = grabImage(ico);
+            let lit = 0;
+            for (let x = 0; x < 24; ++x) for (let y = 0; y < 24; ++y) { const c = g.pixel(x, y); if (c.a > 0.3) lit++; }
+            verify(lit > 10, "the x icon has pixels: " + lit);
+        }
+        function test_avatar_without_a_picture_shows_the_initial() {
+            compare(avatar.loaded, false);
         }
         function test_button_keyboard() {
             btn.forceActiveFocus();

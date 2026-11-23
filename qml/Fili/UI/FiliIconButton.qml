@@ -20,8 +20,8 @@ Rectangle {
     readonly property bool containsMouse: area.containsMouse
     signal clicked()
 
-    width: 28
-    height: 24
+    implicitWidth: 28
+    implicitHeight: 24
     radius: FiliTheme.radiusControl
     color: !enabledState ? "transparent" : accented ? (area.pressed || toggled || area.containsMouse ? FiliTheme.alpha(ink, 0.2) : "transparent") : area.pressed || toggled ? FiliTheme.surfaceActive : area.containsMouse ? FiliTheme.surfaceHover : "transparent"
     activeFocusOnTab: false

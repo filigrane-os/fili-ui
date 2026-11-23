@@ -10,8 +10,8 @@ Rectangle {
     property bool enabledState: true
     signal clicked()
 
-    width: text.implicitWidth + 2 * FiliTheme.space3
-    height: 22
+    implicitWidth: text.implicitWidth + 2 * FiliTheme.space3
+    implicitHeight: 22
     radius: FiliTheme.radiusControl
     color: !enabledState ? "transparent" : area.pressed ? FiliTheme.surfaceActive : area.containsMouse ? FiliTheme.surfaceHover : "transparent"
     border.width: primary ? 1 : 0

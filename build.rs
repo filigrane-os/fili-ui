@@ -27,11 +27,23 @@ fn main() {
         "FiliSidebarRow",
         "FiliTabBar",
         "FiliViewSwitch",
+        "FiliWindowPanel",
+        "FiliLiaButton",
+        "FiliDebugPanel",
+        "FiliMenu",
+        "FiliIcon",
+        "FiliSpinner",
+        "FiliDialog",
+        "FiliAboutCard",
+        "FiliShortcutsCard",
+        "FiliAvatar",
     ];
     let mut module = QmlModule::new("Fili.UI")
         .qml_file(QmlFile::from("qml/Fili/UI/FiliHost.qml").singleton(true))
         .qml_file(QmlFile::from("qml/Fili/UI/FiliTheme.qml").singleton(true))
-        .depend("QtQuick");
+        .depend("QtQuick")
+        .depend("QtQuick.Shapes")
+        .depend("QtQuick.Window");
     for name in plain {
         module = module.qml_file(format!("qml/Fili/UI/{name}.qml"));
     }

@@ -8,8 +8,8 @@ Rectangle {
     property string mode: "list"
     signal chose(string mode)
 
-    width: 2 * 30 + 2 * FiliTheme.space1 + 2
-    height: 30
+    implicitWidth: 2 * 30 + 2 * FiliTheme.space1 + 2
+    implicitHeight: 30
     radius: 8
     color: FiliTheme.surface
     border.width: FiliTheme.borderWidth

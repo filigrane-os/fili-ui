@@ -24,6 +24,25 @@ Window {
         property string accent: "default"
         property int settingsRev: 0
         property bool keyNav: true
+        // What the window panel, the debug panel, the About card and the Lia button ask of the application
+        property string lastAction: ""
+        function tr(text) { return text; }
+        function windowControl() { return false; }
+        function windowState() { return ""; }
+        function windowAction(name) { lastAction = name; }
+        function askLia() { lastAction = "ask Lia"; }
+        function logs(since) {
+            const all = [[0, "Fili UI demo started"], [1, "A notice"], [2, "A warning: the log is a stand-in"], [3, "An error, in the danger colour"]];
+            return JSON.stringify({ seq: all.length, entries: all.slice(since) });
+        }
+        function logFile() { return "/tmp/fili-ui-demo.log"; }
+        function clearLogs() {}
+        function openPath(path) { lastAction = "open " + path; }
+        function copyText(text) {}
+        function reportProblem(text) { return "demo"; }
+        function uiState(key) { return ""; }
+        function setUiState(key, value) {}
+        function aboutRows() { return JSON.stringify([["Version", "0.2.0"], ["Program", "fili-ui"], ["Licence", "GPL-3.0-or-later"]]); }
         function themeJson() {
             const x = new XMLHttpRequest();
             x.open("GET", Qt.resolvedUrl("theme.json"), false);
@@ -35,8 +54,8 @@ Window {
     function showTip(item, text) { tip.text = text; }
     function hideTip(item) { tip.text = ""; }
 
-    property int tab: 0
-    property var tabs: ["Controls", "Colors", "Type"]
+    property int tab: Number(Qt.application.arguments[Qt.application.arguments.length - 1]) >= 0 ? Number(Qt.application.arguments[Qt.application.arguments.length - 1]) : 0
+    property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs"]
     property string place: "Documents"
     property string view: "list"
 
@@ -52,11 +71,12 @@ Window {
         FiliIconButton { glyph: ""; tip: "Next tab"; hint: "Ctrl+Tab"; onClicked: if (win.tab < win.tabs.length - 1) win.tab++ }
         FiliIconButton { glyph: ""; tip: "Disabled"; enabledState: false }
         FiliViewSwitch { mode: win.view; onChose: m => win.view = m }
-        FiliTextField { placeholder: "Search"; clearable: true; width: 180 }
+        FiliLiaButton {}
+        FiliTextField { placeholder: "Search"; clearable: true }
     }
     FiliSidebar {
         id: sidebar
-        anchors { left: parent.left; top: header.bottom; bottom: footer.top }
+        anchors { left: parent.left; top: header.bottom; bottom: debug.top }
         FiliSidebarSection {
             title: "Favorites"
             Repeater {
@@ -79,7 +99,7 @@ Window {
         }
     }
     Column {
-        anchors { left: sidebar.right; right: parent.right; top: header.bottom; bottom: footer.top }
+        anchors { left: sidebar.right; right: parent.right; top: header.bottom; bottom: debug.top }
         FiliTabBar {
             id: tabbar
             width: parent.width
@@ -239,6 +259,66 @@ Window {
                     }
                 }
             }
+            // --- Icons
+            Flow {
+                visible: win.tab === 3
+                x: FiliTheme.margin
+                y: FiliTheme.margin
+                width: parent.width - 2 * FiliTheme.margin
+                spacing: FiliTheme.space4
+                FiliIcon { id: iconProbe; visible: false; width: 0; height: 0 }
+                Repeater {
+                    model: Object.keys(iconProbe.paths)
+                    Column {
+                        required property string modelData
+                        width: 84
+                        spacing: FiliTheme.space1
+                        FiliIcon { anchors.horizontalCenter: parent.horizontalCenter; name: modelData; size: 24; color: FiliTheme.text }
+                        Text { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: modelData; elide: Text.ElideRight; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeLabel; color: FiliTheme.textSecondary }
+                    }
+                }
+            }
+            // --- Dialogs and menus
+            Column {
+                visible: win.tab === 4
+                x: FiliTheme.margin
+                y: FiliTheme.margin
+                spacing: FiliTheme.space4
+                Text { text: "Dialogs, cards and menus"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeSmall; font.weight: FiliTheme.weightAccent; color: FiliTheme.muted }
+                Row {
+                    spacing: FiliTheme.space2
+                    FiliButton { label: "Dialog"; onClicked: dialog.open() }
+                    FiliButton { label: "About card"; onClicked: about.show() }
+                    FiliButton { label: "Shortcuts"; onClicked: shortcuts.show() }
+                    FiliButton { label: "Window actions"; onClicked: windowPanel.open() }
+                    FiliButton { label: "Debug logs"; onClicked: debug.open = !debug.open }
+                }
+                Text { text: "Right click the area below for a menu"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.textSecondary }
+                Rectangle {
+                    width: 360
+                    height: 90
+                    radius: FiliTheme.radiusControl
+                    color: FiliTheme.surface
+                    border.width: FiliTheme.borderWidth
+                    border.color: FiliTheme.border
+                    Text { anchors.centerIn: parent; text: backend.lastAction === "" ? "Last action: none" : "Last action: " + backend.lastAction; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.text }
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton
+                        onClicked: e => { const p = mapToItem(null, e.x, e.y); menu.open(p.x, p.y, [{ id: "open", label: "Open", hint: "Enter" }, { id: "copy", label: "Copy", hint: "Ctrl+C" }, { separator: true }, { id: "view", label: "Show hidden files", checked: true }, { id: "more", label: "More", children: [{ id: "a", label: "First" }, { id: "b", label: "Second" }] }, { id: "off", label: "Unavailable", enabled: false }, { separator: true }, { id: "del", label: "Move to Trash", danger: true }]); }
+                    }
+                }
+                Row {
+                    spacing: FiliTheme.space5
+                    FiliSpinner { size: 48 }
+                    Row {
+                        spacing: FiliTheme.space2
+                        FiliAvatar { name: "Ada"; size: 32 }
+                        FiliAvatar { name: "Bruno"; size: 40 }
+                        FiliAvatar { name: "Chloé"; size: 56 }
+                    }
+                }
+            }
             // --- Type
             Column {
                 visible: win.tab === 2
@@ -260,6 +340,10 @@ Window {
             }
         }
     }
+    FiliDebugPanel {
+        id: debug
+        anchors { left: parent.left; right: parent.right; bottom: footer.top }
+    }
     FiliFooter {
         id: footer
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
@@ -275,5 +359,31 @@ Window {
         font.family: FiliTheme.font
         font.pixelSize: FiliTheme.sizeSmall
         color: FiliTheme.muted
+    }
+    FiliWindowPanel {
+        id: windowPanel
+        anchorRight: win.width - FiliTheme.margin
+        anchorTop: FiliTheme.toolbarHeight
+    }
+    FiliMenu {
+        id: menu
+        onActivated: id => backend.lastAction = "menu: " + id
+    }
+    FiliDialog {
+        id: dialog
+        title: "Rename the folder"
+        confirmLabel: "Rename"
+        confirmEnabled: field.text !== ""
+        onAccepted: backend.lastAction = "renamed to " + field.text
+        FiliTextField { id: field; width: parent.width; placeholder: "Name"; text: "Documents"; onAccepted: dialog.accept() }
+    }
+    FiliAboutCard {
+        id: about
+        appName: "Fili UI"
+        tagline: "The shared controls of Filigrane"
+    }
+    FiliShortcutsCard {
+        id: shortcuts
+        groups: [{ title: "Moving around", rows: [["Alt+←  Alt+→", "Back / forward"], ["Ctrl+F  /", "Search"], ["Ctrl+Shift+W", "Window actions"]] }, { title: "List", rows: [["↑ ↓", "Move"], ["Enter", "Open"], ["Ctrl+A", "Select all"]] }]
     }
 }

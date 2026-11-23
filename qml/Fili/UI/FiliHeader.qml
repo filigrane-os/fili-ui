@@ -3,6 +3,7 @@
 // title bar or menu is drawn in the window: the window title lives in the fili-bar.
 // Children go to `tools` (right, before the close button); `leading` is for what sits left of the title.
 import QtQuick
+import QtQuick.Layouts
 
 Rectangle {
     id: h
@@ -16,13 +17,13 @@ Rectangle {
     implicitHeight: FiliTheme.toolbarHeight
     color: FiliTheme.background
 
-    Row {
+    RowLayout {
         id: leadingRow
         anchors { left: parent.left; leftMargin: FiliTheme.margin; verticalCenter: parent.verticalCenter }
         spacing: FiliTheme.space3
     }
     Column {
-        anchors { left: leadingRow.right; leftMargin: leadingRow.children.length > 0 ? FiliTheme.space3 : 0; right: toolsRow.left; rightMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+        anchors { left: leadingRow.right; leftMargin: leadingRow.visibleChildren.length > 0 ? FiliTheme.space3 : 0; right: toolsRow.left; rightMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
         Text {
             width: parent.width
             text: h.title
@@ -42,9 +43,10 @@ Rectangle {
             color: FiliTheme.textSecondary
         }
     }
-    Row {
+    // A layout, not a Row: it centres each tool vertically whatever its height (a capsule of 30 beside buttons of 24)
+    RowLayout {
         id: toolsRow
-        anchors { right: closeRect.visible ? closeRect.left : parent.right; rightMargin: closeRect.visible ? FiliTheme.space1 : FiliTheme.margin; verticalCenter: parent.verticalCenter }
+        anchors { right: closeRect.visible ? closeRect.left : parent.right; rightMargin: closeRect.visible ? FiliTheme.space3 : FiliTheme.margin; verticalCenter: parent.verticalCenter }
         spacing: FiliTheme.space3
     }
     Rectangle {
