@@ -1,6 +1,7 @@
 // Gallery of the kit as an application window: header, sidebar, tabs, footer and every control in every state, dark and
 // light. Run: make demo
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Window
 import Fili.UI
 
@@ -59,8 +60,8 @@ Window {
     property int tab: { const n = cli.map(Number).filter(v => !isNaN(v) && v >= 0 && v < tabs.length); return n.length ? n[0] : 0; }
     property int layerPicked: 0
     property var layersShown: [true, true, false]
-    property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
-    readonly property var allTabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar"]
+    property var tabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar", "Editor"]
+    readonly property var allTabs: ["Controls", "Colors", "Type", "Icons", "Dialogs", "Fili-bar", "Editor"]
     readonly property string current: tabs[tab] ?? ""
     Component.onCompleted: {
         if (cli.includes("panel")) { panel.settingsPage = "sound"; panel.openAt(bar); }
@@ -289,6 +290,102 @@ Window {
                         Rectangle { width: 140; height: 56; radius: FiliTheme.radiusControl; color: modelData[1]; border.width: FiliTheme.borderWidth; border.color: FiliTheme.border }
                         Text { text: modelData[0]; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeSmall; color: FiliTheme.textSecondary }
                     }
+                }
+            }
+            // --- Editor: the parts of an image editor around its canvas (options bar, tools, dock)
+            Item {
+                id: editor
+                visible: win.current === "Editor"
+                anchors.fill: parent
+                property string tool: "move"
+                property int propertiesTab: 0
+                property int layersTab: 0
+                property int picked: 1
+                property var shown: [true, true, true]
+                FiliOptionsBar {
+                    id: optionsBar
+                    anchors { left: parent.left; right: parent.right; top: parent.top }
+                    Text { text: editor.tool; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+                    FiliCheckBox { label: "Auto-select" }
+                    FiliSelect { Layout.preferredWidth: 110; model: [{ label: "Layer", value: 1 }, { label: "Group", value: 2 }]; current: 1 }
+                    trailing: [FiliTextField { Layout.preferredWidth: 140; placeholder: "Search"; clearable: true }]
+                }
+                FiliToolStrip {
+                    id: tools
+                    anchors { left: parent.left; top: optionsBar.bottom; bottom: parent.bottom }
+                    current: editor.tool
+                    onPicked: id => editor.tool = id
+                    model: [
+                        { id: "move", icon: "move", tip: "Move", hint: "V" },
+                        { sep: true },
+                        { id: "marquee", icon: "square-dashed", tip: "Rectangular Marquee", hint: "M", variants: true },
+                        { id: "lasso", icon: "lasso", tip: "Lasso", hint: "L", variants: true },
+                        { id: "crop", icon: "crop", tip: "Crop", hint: "C" },
+                        { id: "eyedropper", icon: "pipette", tip: "Eyedropper", hint: "I", variants: true },
+                        { sep: true },
+                        { id: "brush", icon: "brush", tip: "Brush", hint: "B", variants: true },
+                        { id: "stamp", icon: "stamp", tip: "Clone Stamp", hint: "S" },
+                        { id: "eraser", icon: "eraser", tip: "Eraser", hint: "E", variants: true },
+                        { id: "bucket", icon: "paint-bucket", tip: "Paint Bucket", hint: "G", variants: true },
+                        { sep: true },
+                        { id: "pen", icon: "pen-tool", tip: "Pen", hint: "P", variants: true },
+                        { id: "type", icon: "type", tip: "Type", hint: "T" },
+                        { id: "select", icon: "mouse-pointer-2", tip: "Path Selection", hint: "A" },
+                        { id: "shape", icon: "square", tip: "Rectangle", hint: "U", variants: true },
+                        { sep: true },
+                        { id: "hand", icon: "hand", tip: "Hand", hint: "H" },
+                        { id: "zoom", icon: "zoom-in", tip: "Zoom", hint: "Z" }
+                    ]
+                    foreground: "#1c1c1c"
+                    background: "#f2f2f2"
+                }
+                FiliDock {
+                    id: dock
+                    anchors { right: parent.right; top: optionsBar.bottom; bottom: parent.bottom }
+                    FiliDockGroup {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 190
+                        tabs: ["Properties", "Adjustments"]
+                        currentIndex: editor.propertiesTab
+                        onTabClicked: i => editor.propertiesTab = i
+                        Column {
+                            spacing: FiliTheme.space3
+                            padding: FiliTheme.space3
+                            Text { text: "Curves"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; font.weight: FiliTheme.weightAccent; color: FiliTheme.text }
+                            FiliSlider { width: 240; value: 0.6; showValue: true }
+                        }
+                        Text { text: "Adjustments"; padding: FiliTheme.space3; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+                    }
+                    FiliDockGroup {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        tabs: ["Layers", "Channels", "Paths"]
+                        currentIndex: editor.layersTab
+                        onTabClicked: i => editor.layersTab = i
+                        Column {
+                            Repeater {
+                                model: [{ name: "Curves 1", kind: "Adjustment", opacity: "80 %" }, { name: "Title", kind: "Type", opacity: "" }, { name: "Background", kind: "Pixel", opacity: "" }]
+                                FiliLayerRow {
+                                    required property var modelData
+                                    required property int index
+                                    label: modelData.name
+                                    subtitle: modelData.kind
+                                    detail: modelData.opacity
+                                    selected: editor.picked === index
+                                    layerVisible: editor.shown[index]
+                                    onClicked: editor.picked = index
+                                    onVisibilityToggled: shown => { const l = editor.shown.slice(); l[index] = shown; editor.shown = l; }
+                                }
+                            }
+                        }
+                        Text { text: "Channels"; padding: FiliTheme.space3; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+                        Text { text: "Paths"; padding: FiliTheme.space3; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
+                    }
+                }
+                Rectangle {
+                    anchors { left: tools.right; right: dock.left; top: optionsBar.bottom; bottom: parent.bottom }
+                    color: FiliTheme.backgroundDeep
+                    Text { anchors.centerIn: parent; text: "canvas"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.muted }
                 }
             }
             // --- Icons

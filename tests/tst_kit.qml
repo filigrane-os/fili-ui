@@ -1,5 +1,6 @@
 // Behaviour of the controls and of the window anatomy, headless (QT_QPA_PLATFORM=offscreen, see scripts/run-tests.sh).
 import QtQuick
+import QtQuick.Layouts
 import QtTest
 import Fili.UI
 
@@ -46,6 +47,26 @@ Item {
             }
         }
         FiliLayerRow { id: layerRow; width: 200; label: "Curves"; detail: "80 %"; onVisibilityToggled: shown => layerVisible = shown }
+        FiliToolStrip {
+            id: toolStrip
+            height: 300
+            model: [{ id: "move", icon: "move", tip: "Move" }, { sep: true }, { id: "brush", icon: "brush", tip: "Brush", variants: true }, { id: "hand", icon: "hand", tip: "Hand" }]
+            current: "move"
+        }
+        FiliOptionsBar { id: optionsBar; width: 400; closeButton: true; FiliCheckBox { id: optionsCheck; label: "Auto" } }
+        FiliDock {
+            id: dock
+            height: 240
+            FiliDockGroup {
+                id: dockGroup
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                tabs: ["One", "Two", "Three"]
+                Rectangle { id: panelOne; color: "red" }
+                Rectangle { id: panelTwo; color: "green" }
+                Rectangle { id: panelThree; color: "blue" }
+            }
+        }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
@@ -86,6 +107,8 @@ Item {
     SignalSpy { id: pickedSpy; target: se; signalName: "picked" }
     SignalSpy { id: rowSpy; target: row1; signalName: "clicked" }
     SignalSpy { id: layerSpy; target: layerRow; signalName: "clicked" }
+    SignalSpy { id: toolSpy; target: toolStrip; signalName: "picked" }
+    SignalSpy { id: optionsCloseSpy; target: optionsBar; signalName: "closeRequested" }
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
     SignalSpy { id: closeSpy; target: tabs; signalName: "closeRequested" }
@@ -221,6 +244,47 @@ Item {
             mouseClick(root, e.x, e.y);
             compare(layerRow.layerVisible, false, "the eye hides the layer");
             compare(layerSpy.count, 1, "the eye does not select");
+        }
+        function test_tool_strip_picks_a_tool_and_ignores_separators() {
+            toolSpy.clear();
+            const cell = i => toolStrip.children[1].children[i];   // children[0] is the border line, [1] the column of tools
+            const c = cell(2).mapToItem(root, 16, 16);
+            mouseClick(root, c.x, c.y);
+            compare(toolSpy.count, 1);
+            compare(toolSpy.signalArguments[0][0], "brush");
+            const s = cell(1).mapToItem(root, 16, 4);
+            mouseClick(root, s.x, s.y);
+            compare(toolSpy.count, 1, "a separator picks nothing");
+        }
+        function test_options_bar_closes_and_lays_out_its_options() {
+            optionsCloseSpy.clear();
+            const p = optionsBar.mapToItem(root, optionsBar.width - 14 - (optionsBar.height - 24) / 2, optionsBar.height / 2);
+            mouseClick(root, p.x, p.y);
+            compare(optionsCloseSpy.count, 1);
+            verify(optionsCheck.mapToItem(optionsBar, 0, 0).x >= FiliTheme.margin, "options start at the margin");
+        }
+        function test_dock_group_shows_only_the_current_panel_and_fills() {
+            compare(panelOne.visible, true);
+            compare(panelTwo.visible, false);
+            compare(panelThree.visible, false);
+            dockGroup.currentIndex = 2;
+            compare(panelOne.visible, false);
+            compare(panelThree.visible, true);
+            verify(panelThree.width === dockGroup.width && panelThree.height > 0, "the panel fills the group");
+            dockGroup.currentIndex = 0;
+        }
+        function test_dock_is_resized_by_its_edge_within_its_limits() {
+            const w0 = dock.width;
+            const e = dock.mapToItem(root, 2, 100);
+            mousePress(root, e.x, e.y);
+            mouseMove(root, e.x - 60, e.y);
+            mouseRelease(root, e.x - 60, e.y);
+            compare(dock.dockWidth, Math.min(dock.maxWidth, w0 + 60));
+            const e2 = dock.mapToItem(root, 2, 100);   // the edge has moved with the new width
+            mousePress(root, e2.x, e2.y);
+            mouseMove(root, e2.x + 1000, e2.y);
+            mouseRelease(root, e2.x + 1000, e2.y);
+            compare(dock.dockWidth, dock.minWidth);
         }
         // The tabs are the Repeater's items in the strip (the first child of the bar)
         function tabItem(i) { return tabs.children[0].children[i]; }

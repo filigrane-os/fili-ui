@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0
+
+The parts of an image editor around its canvas (fili-photocraft), which does not use the sidebar of the usual window.
+
+- `FiliToolStrip`: the column of tools (44 wide), separators between the groups, the current tool in the accent colour, a corner mark
+  for a tool with variants, a hover label drawn by the window, the foreground and background colours at the bottom.
+- `FiliOptionsBar`: the band under the top edge (options of the current tool, `trailing`, close button as `FiliHeader` has it).
+- `FiliDock` and `FiliDockGroup`: the column of panels on the right, resizable by its left edge, each group a row of text tabs and the
+  panel of the current tab (Properties / Adjustments, Layers / Channels / Paths).
+- `FiliLayerRow` (new in this release, with the eye icons): a `subtitle` (the kind of layer) under the name and a `thumbnail`.
+- `FiliIcon`: the tool icons of an editor (move, marquee, lasso, crop, pipette, brush, stamp, eraser, paint bucket, pen, type, path
+  selection, square, hand, zoom, layers, sliders, history, palette, compass…), 81 in all.
+- The demo has an Editor page with all of it.
+
 ## 0.3.0
 
 - `FiliTabBar` is the one tab row of every application and a tab can always be moved, closed and detached, the same way everywhere
