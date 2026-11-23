@@ -67,6 +67,7 @@ Item {
                 Rectangle { id: panelThree; color: "blue" }
             }
         }
+        FiliCurveEditor { id: curveEditor; width: 200; height: 200 }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
         FiliViewSwitch { id: vs; mode: "list" }
         FiliButton { id: btn; label: "Go" }
@@ -108,6 +109,7 @@ Item {
     SignalSpy { id: rowSpy; target: row1; signalName: "clicked" }
     SignalSpy { id: layerSpy; target: layerRow; signalName: "clicked" }
     SignalSpy { id: toolSpy; target: toolStrip; signalName: "picked" }
+    SignalSpy { id: curveSpy; target: curveEditor; signalName: "pointsCommitted" }
     SignalSpy { id: optionsCloseSpy; target: optionsBar; signalName: "closeRequested" }
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
@@ -285,6 +287,39 @@ Item {
             mouseMove(root, e2.x + 1000, e2.y);
             mouseRelease(root, e2.x + 1000, e2.y);
             compare(dock.dockWidth, dock.minWidth);
+        }
+        function test_curve_editor_adds_moves_and_removes_points() {
+            curveSpy.clear();
+            curveEditor.points = [[0, 0], [255, 255]];
+            const at = (vx, vy) => curveEditor.mapToItem(root, vx / 255 * 200, 200 - vy / 255 * 200);
+            // A click in the middle of the graph adds a point there
+            let p = at(128, 192);
+            mousePress(root, p.x, p.y);
+            mouseRelease(root, p.x, p.y);
+            compare(curveSpy.count, 1);
+            let pts = curveSpy.signalArguments[0][0];
+            compare(pts.length, 3);
+            compare(pts[1][0], 128);
+            verify(Math.abs(pts[1][1] - 192) <= 2, "the point is where the pointer was");
+            curveEditor.points = pts;
+            // Dragging it moves it, and it cannot pass its neighbour
+            p = at(128, 192);
+            mousePress(root, p.x, p.y);
+            mouseMove(root, p.x + 500, p.y - 500);
+            mouseRelease(root, p.x + 500, p.y - 500);
+            pts = curveSpy.signalArguments[curveSpy.count - 1][0];
+            compare(pts[1][0], 254);
+            compare(pts[1][1], 255);
+            curveEditor.points = pts;
+            // Double click removes it, the two ends stay
+            p = at(254, 255);
+            mouseDoubleClickSequence(root, p.x, p.y);
+            pts = curveSpy.signalArguments[curveSpy.count - 1][0];
+            compare(pts.length, 2);
+            curveEditor.points = pts;
+            p = at(0, 0);
+            mouseDoubleClickSequence(root, p.x, p.y);
+            compare(curveEditor.drawn.length, 2, "a curve keeps its two ends");
         }
         // The tabs are the Repeater's items in the strip (the first child of the bar)
         function tabItem(i) { return tabs.children[0].children[i]; }

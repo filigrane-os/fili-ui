@@ -25,6 +25,7 @@ FiliToolStrip 1.0 FiliToolStrip.qml
 FiliOptionsBar 1.0 FiliOptionsBar.qml
 FiliDockGroup 1.0 FiliDockGroup.qml
 FiliDock 1.0 FiliDock.qml
+FiliCurveEditor 1.0 FiliCurveEditor.qml
 FiliTabBar 1.0 FiliTabBar.qml
 FiliViewSwitch 1.0 FiliViewSwitch.qml
 FiliWindowPanel 1.0 FiliWindowPanel.qml

@@ -299,6 +299,7 @@ Window {
                 anchors.fill: parent
                 property string tool: "move"
                 property int propertiesTab: 0
+                property var curve: [[0, 0], [64, 48], [192, 212], [255, 255]]
                 property int layersTab: 0
                 property int picked: 1
                 property var shown: [true, true, true]
@@ -344,7 +345,7 @@ Window {
                     anchors { right: parent.right; top: optionsBar.bottom; bottom: parent.bottom }
                     FiliDockGroup {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 190
+                        Layout.preferredHeight: 270
                         tabs: ["Properties", "Adjustments"]
                         currentIndex: editor.propertiesTab
                         onTabClicked: i => editor.propertiesTab = i
@@ -352,7 +353,12 @@ Window {
                             spacing: FiliTheme.space3
                             padding: FiliTheme.space3
                             Text { text: "Curves"; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; font.weight: FiliTheme.weightAccent; color: FiliTheme.text }
-                            FiliSlider { width: 240; value: 0.6; showValue: true }
+                            FiliCurveEditor {
+                                width: 180
+                                height: 180
+                                points: editor.curve
+                                onPointsCommitted: p => editor.curve = p
+                            }
                         }
                         Text { text: "Adjustments"; padding: FiliTheme.space3; font.family: FiliTheme.font; font.pixelSize: FiliTheme.size; color: FiliTheme.textSecondary }
                     }

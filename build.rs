@@ -30,6 +30,7 @@ fn main() {
         "FiliOptionsBar",
         "FiliDockGroup",
         "FiliDock",
+        "FiliCurveEditor",
         "FiliTabBar",
         "FiliViewSwitch",
         "FiliWindowPanel",
