@@ -174,6 +174,12 @@ Item {
             compare(input.echoMode, TextInput.Password);
             compare(tfSecret.text, "hunter2");
             compare(tfSecret.children[1].visible, false, "no × on a secret");
+            tfSecret.readOnly = true;
+            compare(input.readOnly, true);
+            tfSecret.readOnly = false;
+            tfSecret.inputMethodHints = Qt.ImhDigitsOnly;
+            compare(input.inputMethodHints, Qt.ImhDigitsOnly);
+            tfSecret.inputMethodHints = Qt.ImhNone;
         }
         function test_many_tabs_scroll_and_keep_the_current_one_in_view() {
             verify(manyTabs.overflows, "8 tabs of 80 do not fit in 300");
