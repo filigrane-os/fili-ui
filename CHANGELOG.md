@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliAvatar` shows its picture: the Canvas never said `imageLoaded` for a picture already read by the probe image, so it stayed hidden behind the initial. Tested with a real picture (`tests/avatar.png`).
+
 - `FiliShortcutsCard`: a long description (or key combination) wraps onto several lines instead of being cut with an ellipsis.
 
 - `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()` and `blurField()`.

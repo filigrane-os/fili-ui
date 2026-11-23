@@ -63,6 +63,7 @@ Item {
         }
         FiliIcon { id: ico; name: "x"; size: 24; color: "#ffffff" }
         FiliAvatar { id: avatar; name: "Ada" }
+        FiliAvatar { id: avatarPic; name: "Pic"; size: 40; source: Qt.resolvedUrl("avatar.png") }
     }
     FiliDialog {
         id: dlg
@@ -425,6 +426,14 @@ Item {
             let lit = 0;
             for (let x = 0; x < 24; ++x) for (let y = 0; y < 24; ++y) { const c = g.pixel(x, y); if (c.a > 0.3) lit++; }
             verify(lit > 10, "the x icon has pixels: " + lit);
+        }
+        function test_avatar_with_a_picture_draws_it() {
+            tryVerify(() => avatarPic.loaded, 3000, "the picture is not loaded");
+            wait(100);
+            const g = grabImage(avatarPic);
+            const c = g.pixel(20, 20);
+            // The gradient is red to blue: the middle is neither the grey of the initial's disc nor transparent
+            verify(c.r > 0.15 || c.b > 0.15, "the picture is not drawn: " + c);
         }
         function test_avatar_without_a_picture_shows_the_initial() {
             compare(avatar.loaded, false);
