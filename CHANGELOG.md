@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `FiliTabBar` items take `closable: false` (a fixed tab, such as the categories of a mailbox: no ×, no middle click, no Delete).
+
 - `FiliTextField.secret`: dots instead of the text (passwords), no ×; `readOnly`, `inputMethodHints` and `tabNext` (the field Tab goes to), for the account forms of Facteur.
 
 - `FiliTabBar` scrolls with the wheel when the tabs do not fit (each keeps 80 at least) and keeps the current tab in view (`overflows`, `scrollX`): Facteur's many pinned folders.

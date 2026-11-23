@@ -11,7 +11,7 @@
 //  - many tabs: below 80 each the row scrolls with the wheel (`overflows`) and keeps the current tab in view.
 //  - also: `contextRequested(index, x, y)` on right click, `addRequested()` for the + button (`addable`), files dragged over a tab
 //    (`tabDropped(index, drop)`; hovering one for `springDelay` ms selects it, so the target can be chosen in the view).
-// model = [label, …] or [{ label, count, icon, iconColor, spin }, …] (`count`: a muted figure after the label, such as unread
+// model = [label, …] or [{ label, count, icon, iconColor, spin, closable }, …] (`count`: a muted figure after the label, such as unread
 // messages; `icon`: the name of a FiliIcon shown before the label, in `iconColor` (a colour, `textSecondary` by default), turning
 // while `spin` is true and the window is active: a command running, a conversation loading; `dots`: colours of small discs shown
 // before the label, such as the platforms of a conversation).
@@ -71,6 +71,8 @@ Rectangle {
     function labelOf(m) { return typeof m === "string" ? m : m.label; }
     function countOf(m) { return typeof m === "string" ? "" : (m.count ?? ""); }
     function dotsOf(m) { return typeof m === "string" ? [] : (m.dots ?? []); }
+    // A tab can opt out of closing (`closable: false`, such as the fixed categories of a mailbox)
+    function closableOf(m) { return bar.closable && (typeof m === "string" || m.closable !== false); }
     function iconOf(m) { return typeof m === "string" ? "" : (m.icon ?? ""); }
     // Sideways shift of a tab that is not the picked one: it makes room for it
     function shiftOf(i) {
@@ -130,7 +132,7 @@ Rectangle {
                     } else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) {
                         FiliHost.keyboard();
                         bar.tabClicked(index);
-                    } else if (e.key === Qt.Key_Delete && bar.closable) {
+                    } else if (e.key === Qt.Key_Delete && bar.closableOf(modelData)) {
                         FiliHost.keyboard();
                         bar.closeRequested(index);
                     } else {
@@ -255,7 +257,7 @@ Rectangle {
                             return;
                         }
                         if (e.button === Qt.MiddleButton) {
-                            if (bar.closable)
+                            if (bar.closableOf(tab.modelData))
                                 bar.closeRequested(tab.index);
                         } else if (e.button === Qt.RightButton) {
                             const p = area.mapToItem(null, e.x, e.y);
@@ -269,7 +271,7 @@ Rectangle {
                 // The ×: on hover and on the current tab
                 Text {
                     id: closeX
-                    visible: bar.closable && (area.containsMouse || xHit.containsMouse || tab.current)
+                    visible: bar.closableOf(tab.modelData) && (area.containsMouse || xHit.containsMouse || tab.current)
                     anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
                     text: "×"
                     font.pixelSize: 16

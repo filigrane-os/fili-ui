@@ -169,6 +169,11 @@ Item {
             compare(tf.text, "", "Esc clears too");
             compare(clearedSpy.count, 2);
         }
+        function test_a_tab_can_opt_out_of_closing() {
+            compare(manyTabs.closableOf("One"), true);
+            compare(manyTabs.closableOf({ label: "Fixed", closable: false }), false);
+            compare(manyTabs.closableOf({ label: "Free" }), true);
+        }
         function test_a_secret_field_shows_dots_and_no_clear_button() {
             const input = tfSecret.children[0];
             compare(input.echoMode, TextInput.Password);
