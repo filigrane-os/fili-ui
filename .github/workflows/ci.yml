@@ -31,7 +31,7 @@ jobs:
             ghcr.io/void-linux/void-glibc-full:latest sh -exc '
               xbps-install -Syu xbps || true
               xbps-install -Syu
-              xbps-install -y bash cargo gcc make pkg-config python3 git qt6-base-devel qt6-declarative-devel qt6-svg-devel
+              xbps-install -y bash cargo gcc make pkg-config python3 git qt6-base-devel qt6-declarative-devel qt6-svg-devel qt6-quick-test
               make check'
 
   release:

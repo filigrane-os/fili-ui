@@ -12,6 +12,20 @@ fn main() {
         "FiliButton",
         "FiliIconButton",
         "WindowGlyph",
+        "FiliSwitch",
+        "FiliCheckBox",
+        "FiliRadioButton",
+        "FiliSlider",
+        "FiliProgressBar",
+        "FiliTextField",
+        "FiliSelect",
+        "FiliNavCapsule",
+        "FiliHeader",
+        "FiliFooter",
+        "FiliSidebar",
+        "FiliSidebarSection",
+        "FiliSidebarRow",
+        "FiliTabBar",
     ];
     let mut module = QmlModule::new("Fili.UI")
         .qml_file(QmlFile::from("qml/Fili/UI/FiliHost.qml").singleton(true))

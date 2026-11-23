@@ -6,4 +6,9 @@ import QtQuick
 
 QtObject {
     property var backend: null
+    // The keyboard was used: the focus ring shows (backend.keyNav), like in the fili-shell
+    function keyboard() {
+        if (backend)
+            backend.keyNav = true;
+    }
 }

@@ -22,7 +22,13 @@ shared. The kit removes it with `FiliHost.backend`.
 Consequence: the keyboard-access fix exists only in two of seven apps, and the tip cost (Qt Quick Controls `ToolTip`,
 about 3 MB per window process, measured by fili-term) is paid by mail and im.
 
-## Not in the kit yet (next batch)
+## Added in 0.2.0
+
+Switch, check box, radio, slider, text field, select, progress bar, header, nav capsule, sidebar (section, row), tab bar, footer.
+Casier's own header, sidebar and tabs are still written in its `Main.qml` / `Sidebar.qml`: the next step is to move each application onto
+these components, one by one, comparing the window before and after (`docs/adoption.md`, step 5).
+
+## Not in the kit yet
 
 - `Icon.qml` (line icons, in mail/im/term), needed to complete `FiliIconButton`.
 - Text input, switch, slider, select, checkbox. The apps hand-roll these in their own `Main.qml`; the fili-shell has

@@ -7,3 +7,17 @@ FiliScrollBar 1.0 FiliScrollBar.qml
 FiliButton 1.0 FiliButton.qml
 FiliIconButton 1.0 FiliIconButton.qml
 WindowGlyph 1.0 WindowGlyph.qml
+FiliSwitch 1.0 FiliSwitch.qml
+FiliCheckBox 1.0 FiliCheckBox.qml
+FiliRadioButton 1.0 FiliRadioButton.qml
+FiliSlider 1.0 FiliSlider.qml
+FiliProgressBar 1.0 FiliProgressBar.qml
+FiliTextField 1.0 FiliTextField.qml
+FiliSelect 1.0 FiliSelect.qml
+FiliNavCapsule 1.0 FiliNavCapsule.qml
+FiliHeader 1.0 FiliHeader.qml
+FiliFooter 1.0 FiliFooter.qml
+FiliSidebar 1.0 FiliSidebar.qml
+FiliSidebarSection 1.0 FiliSidebarSection.qml
+FiliSidebarRow 1.0 FiliSidebarRow.qml
+FiliTabBar 1.0 FiliTabBar.qml
