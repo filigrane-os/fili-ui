@@ -48,6 +48,11 @@ Item {
                 return;
             unloadImage(av.source);
             loadImage(av.source);
+            // The probe has already read the picture, so the Canvas finds it in the cache and never says imageLoaded
+            if (isImageLoaded(av.source)) {
+                ready = true;
+                requestPaint();
+            }
         }
         onImageLoaded: {
             ready = true;

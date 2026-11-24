@@ -9,6 +9,12 @@ Rectangle {
     property bool clearable: false
     property bool enabledState: true
     property bool error: false
+    // Dots instead of the text (passwords); the × stays off
+    property bool secret: false
+    // Shown but not editable (an address); the keyboard hints of the field (an e-mail address, digits); the field Tab goes to
+    property bool readOnly: false
+    property int inputMethodHints: Qt.ImhNone
+    property Item tabNext: null
     readonly property bool hasFocus: input.activeFocus
     signal accepted()
     signal cleared()
@@ -28,6 +34,9 @@ Rectangle {
         cleared();
     }
     function focusField() { input.forceActiveFocus(); }
+    function selectAll() { input.selectAll(); }
+    // Gives up the keyboard focus (Esc in a filter that hands the keys back to the list)
+    function blurField() { input.focus = false; }
 
     TextInput {
         id: input
@@ -40,6 +49,10 @@ Rectangle {
         selectionColor: FiliTheme.accentColor
         selectedTextColor: FiliTheme.background
         selectByMouse: true
+        readOnly: f.readOnly
+        inputMethodHints: f.inputMethodHints
+        KeyNavigation.tab: f.tabNext
+        echoMode: f.secret ? TextInput.Password : TextInput.Normal
         activeFocusOnTab: true
         onAccepted: f.accepted()
         Keys.onEscapePressed: e => {
@@ -58,7 +71,7 @@ Rectangle {
     }
     Text {
         id: x
-        visible: f.clearable && input.text !== ""
+        visible: f.clearable && !f.secret && input.text !== ""
         anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
         text: "✕"
         font.pixelSize: FiliTheme.sizeSmall

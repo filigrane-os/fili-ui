@@ -33,6 +33,8 @@ Item {
         FiliSlider { id: slSteps; width: 200; steps: 4 }
         FiliTextField { id: tf; width: 200; clearable: true; placeholder: "Search" }
         FiliTextField { id: tfPlain; width: 200 }
+        FiliTextField { id: tfSecret; visible: false; width: 200; secret: true; clearable: true; text: "hunter2" }
+        FiliTabBar { id: manyTabs; visible: false; width: 300; model: ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"] }
         FiliSelect { id: se; width: 160; model: [{ label: "One", value: 1 }, { label: "Two", value: 2, off: true }, { label: "Three", value: 3 }]; current: 1 }
         FiliSidebar {
             id: sb
@@ -46,7 +48,10 @@ Item {
             }
         }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
+        FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }, { label: "D", dots: ["#ff0000", "#00ff00"] }] }
+        FiliIconButton { id: lineIcon; name: "search"; filled: true }
         FiliViewSwitch { id: vs; mode: "list" }
+        FiliViewSwitch { id: vs3; visible: false; mode: "side"; modes: [{ key: "auto", icon: "layout-auto", tip: "Automatic" }, { key: "side", icon: "layout-right", tip: "Right" }, { key: "bottom", icon: "layout-below", tip: "Below" }] }
         FiliButton { id: btn; label: "Go" }
         FiliHeader {
             id: hdr
@@ -61,6 +66,7 @@ Item {
         }
         FiliIcon { id: ico; name: "x"; size: 24; color: "#ffffff" }
         FiliAvatar { id: avatar; name: "Ada" }
+        FiliAvatar { id: avatarPic; name: "Pic"; size: 40; source: Qt.resolvedUrl("avatar.png") }
     }
     FiliDialog {
         id: dlg
@@ -68,7 +74,7 @@ Item {
         FiliTextField { id: dlgField; width: parent.width; text: "x" }
     }
     FiliAboutCard { id: aboutCard; appName: "App"; rows: [["Version", "1"]] }
-    FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"]] }] }
+    FiliShortcutsCard { id: shortcutsCard; groups: [{ title: "G", rows: [["Ctrl+X", "Cut"], ["Space", "A long description that does not fit on one line of the card and must wrap instead of being cut short with an ellipsis at its end, whatever the width"]] }] }
     FiliMenu { id: menu }
     FiliTooltip { id: tooltip }
     FiliPanel { id: panel; settingsPage: "sound"; FiliPanelSection { text: "OUTPUT"; divided: false } }
@@ -163,6 +169,35 @@ Item {
             keyClick(Qt.Key_Escape);
             compare(tf.text, "", "Esc clears too");
             compare(clearedSpy.count, 2);
+        }
+        function test_a_tab_can_opt_out_of_closing() {
+            compare(manyTabs.closableOf("One"), true);
+            compare(manyTabs.closableOf({ label: "Fixed", closable: false }), false);
+            compare(manyTabs.closableOf({ label: "Free" }), true);
+        }
+        function test_a_secret_field_shows_dots_and_no_clear_button() {
+            const input = tfSecret.children[0];
+            compare(input.echoMode, TextInput.Password);
+            compare(tfSecret.text, "hunter2");
+            compare(tfSecret.children[1].visible, false, "no × on a secret");
+            tfSecret.readOnly = true;
+            compare(input.readOnly, true);
+            tfSecret.readOnly = false;
+            tfSecret.inputMethodHints = Qt.ImhDigitsOnly;
+            compare(input.inputMethodHints, Qt.ImhDigitsOnly);
+            tfSecret.inputMethodHints = Qt.ImhNone;
+        }
+        function test_many_tabs_scroll_and_keep_the_current_one_in_view() {
+            verify(manyTabs.overflows, "8 tabs of 80 do not fit in 300");
+            compare(manyTabs.scrollX, 0);
+            manyTabs.currentIndex = 7;
+            verify(manyTabs.scrollX > 0, "the last tab is brought into view");
+            verify(manyTabs.scrollX <= manyTabs.contentWidth - manyTabs.viewWidth);
+            manyTabs.currentIndex = 0;
+            compare(manyTabs.scrollX, 0);
+            manyTabs.scrollX = manyTabs.clampScroll(10000);
+            compare(manyTabs.scrollX, manyTabs.clampScroll(1e9), "clamped to the end");
+            manyTabs.scrollX = 0;
         }
         function test_a_plain_field_has_no_clear_button() {
             tfPlain.text = "abc";
@@ -297,6 +332,42 @@ Item {
             compare(orderSpy.signalArguments[0][0], 1);
             compare(orderSpy.signalArguments[0][1], 2);
         }
+        function test_tab_with_an_icon_shifts_its_label() {
+            waitForRendering(iconTabs);
+            verify(iconTabs.iconOf(iconTabs.model[1]) === "check");
+            verify(iconTabs.iconOf(iconTabs.model[0]) === "");
+            verify(iconTabs.iconOf("A") === "");
+        }
+        function test_tab_dots_and_field_selection() {
+            compare(iconTabs.dotsOf(iconTabs.model[3]).length, 2);
+            compare(iconTabs.dotsOf("A").length, 0);
+            compare(iconTabs.dotsOf(iconTabs.model[1]).length, 0);
+            hdrSearch.text = "abc";
+            hdrSearch.focusField();
+            hdrSearch.selectAll();
+            hdrSearch.blurField();
+            verify(!hdrSearch.hasFocus);
+            hdrSearch.clear();
+            compare(hdrSearch.text, "");
+        }
+        function test_icon_button_draws_a_line_icon_or_a_glyph() {
+            verify(lineIcon.name === "search");
+            verify(lineIcon.filled);
+            verify(lineIcon.iconSize === 16);
+            compare(hdrIcon.name, "");
+        }
+        function test_view_switch_with_three_modes() {
+            compare(vs3.items.length, 3);
+            compare(vs3.implicitWidth, 3 * vs3.segmentWidth + 2 * FiliTheme.space1 + 2);
+            compare(vs3.Accessible.name, "Right");
+            const got = [];
+            vs3.chose.connect(m => got.push(m));
+            vs3.pick("bottom");
+            vs3.step(-1);
+            compare(got.join(","), "bottom,auto", "Left from the current mode goes one segment back");
+            vs3.pick("side");
+            compare(got.length, 2, "the mode already shown does nothing");
+        }
         function test_view_switch() {
             // The segments are the capsule's children: list on the left, grid on the right
             const grid = vs.children[2];
@@ -359,6 +430,14 @@ Item {
             keyClick(Qt.Key_F1);
             compare(shortcutsCard.visible, false);
         }
+        function test_long_shortcut_descriptions_wrap_instead_of_being_cut() {
+            shortcutsCard.show();
+            wait(50);
+            const t = findChild(shortcutsCard, "shortcutDescription");
+            verify(t !== null);
+            verify(!t.truncated, "the description is cut");
+            verify(t.lineCount >= 1);
+        }
         function test_menu_skips_separators_and_unavailable_entries() {
             menu.open(20, 20, [{ id: "a", label: "A" }, { separator: true }, { id: "b", label: "B", enabled: false }, { id: "c", label: "C", danger: true }]);
             compare(menu.visible, true);
@@ -391,6 +470,14 @@ Item {
             let lit = 0;
             for (let x = 0; x < 24; ++x) for (let y = 0; y < 24; ++y) { const c = g.pixel(x, y); if (c.a > 0.3) lit++; }
             verify(lit > 10, "the x icon has pixels: " + lit);
+        }
+        function test_avatar_with_a_picture_draws_it() {
+            tryVerify(() => avatarPic.loaded, 3000, "the picture is not loaded");
+            wait(100);
+            const g = grabImage(avatarPic);
+            const c = g.pixel(20, 20);
+            // The gradient is red to blue: the middle is neither the grey of the initial's disc nor transparent
+            verify(c.r > 0.15 || c.b > 0.15, "the picture is not drawn: " + c);
         }
         function test_avatar_without_a_picture_shows_the_initial() {
             compare(avatar.loaded, false);

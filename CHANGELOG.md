@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.4.0
+
+What the six applications needed to leave their own copies (Cassette, Baladeur, Aeroport, Conversations, Facteur, Lia).
+
+- `FiliViewSwitch` takes any number of segments (`modes: [{ key, icon, tip }]`, icons of the kit; default still list / grid with drawn pictograms), a hover label per segment and the accent-band tints (`accented`, `ink`): where the reader goes in Facteur (automatic, right, below).
+
+- `FiliTabBar` items take `closable: false` (a fixed tab, such as the categories of a mailbox: no ×, no middle click, no Delete).
+
+- `FiliTextField.secret`: dots instead of the text (passwords), no ×; `readOnly`, `inputMethodHints` and `tabNext` (the field Tab goes to), for the account forms of Facteur.
+
+- `FiliTabBar` scrolls with the wheel when the tabs do not fit (each keeps 80 at least) and keeps the current tab in view (`overflows`, `scrollX`): Facteur's many pinned folders.
+
+- `FiliAvatar` shows its picture: the Canvas never said `imageLoaded` for a picture already read by the probe image, so it stayed hidden behind the initial. Tested with a real picture (`tests/avatar.png`).
+
+- `FiliShortcutsCard`: a long description (or key combination) wraps onto several lines instead of being cut with an ellipsis.
+
+- `FiliTabBar` items take `dots` (colours of small discs before the label, such as the platforms of a conversation); `FiliTextField.selectAll()` and `blurField()`.
+
+- `FiliDebugPanel`: the header goes on two lines when the panel is narrow (a drawer): title and filters, then the actions; one line as before when it fits.
+
+- `FiliIconButton` draws a line icon of the kit when `name` is set (`filled`, `iconSize`, 16 by default), the font glyph otherwise: the toolbar buttons of Facteur, Conversations and Aeroport.
+- `FiliTabBar` items take an `icon` (a FiliIcon name before the label), an `iconColor` and `spin` (the icon turns while the window is active): a command running, a check, a bell.
+
 ## 0.3.0
 
 - `FiliTabBar` is the one tab row of every application and a tab can always be moved, closed and detached, the same way everywhere

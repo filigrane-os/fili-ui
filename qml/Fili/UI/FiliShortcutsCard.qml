@@ -70,8 +70,8 @@ Rectangle {
                                 required property var modelData
                                 width: column.width
                                 spacing: FiliTheme.space3
-                                Text { width: 250; text: modelData[0]; elide: Text.ElideRight; font.family: FiliTheme.mono; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.accentColor }
-                                Text { width: parent.width - 250 - FiliTheme.space3; text: modelData[1]; elide: Text.ElideRight; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.text }
+                                Text { width: 250; text: modelData[0]; wrapMode: Text.Wrap; font.family: FiliTheme.mono; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.accentColor }
+                                Text { objectName: "shortcutDescription"; width: parent.width - 250 - FiliTheme.space3; text: modelData[1]; wrapMode: Text.Wrap; font.family: FiliTheme.font; font.pixelSize: FiliTheme.sizeList; color: FiliTheme.text }
                             }
                         }
                     }
