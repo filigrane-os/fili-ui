@@ -10,6 +10,10 @@ Item {
     property string detail
     property string subtitle
     property url thumbnail
+    // The mask of the layer, when it has one: its picture next to the layer's, `maskSelected` when painting goes to the mask, `maskClicked` on a click
+    property url maskThumbnail
+    property bool maskSelected: false
+    signal maskClicked()
     property int depth: 0
     property bool layerVisible: true
     property bool selected: false
@@ -17,7 +21,7 @@ Item {
     signal visibilityToggled(bool shown)
 
     width: parent ? parent.width : 0
-    readonly property bool tall: subtitle !== "" || thumbnail != ""
+    readonly property bool tall: subtitle !== "" || thumbnail != "" || maskThumbnail != ""
     height: FiliTheme.sideRowHeight + (tall ? 18 : 4)
     activeFocusOnTab: true
     Accessible.role: Accessible.ListItem
@@ -77,8 +81,22 @@ Item {
         border { width: 1; color: FiliTheme.border }
         Image { anchors { fill: parent; margins: 1 } source: r.thumbnail; fillMode: Image.PreserveAspectFit; asynchronous: true; cache: false }
     }
+    Rectangle {
+        id: maskThumb
+        visible: r.maskThumbnail != ""
+        anchors { left: thumb.visible ? thumb.right : eye.right; leftMargin: thumb.visible ? 4 : FiliTheme.space2 + 2; verticalCenter: parent.verticalCenter }
+        width: 32
+        height: 32
+        radius: 2
+        color: FiliTheme.backgroundDeep
+        border { width: r.maskSelected ? 2 : 1; color: r.maskSelected ? FiliTheme.accentColor : FiliTheme.border }
+        Accessible.role: Accessible.Button
+        Accessible.name: "Mask"
+        Image { anchors { fill: parent; margins: 2 } source: r.maskThumbnail; fillMode: Image.PreserveAspectFit; asynchronous: true; cache: false }
+        MouseArea { anchors.fill: parent; onClicked: { FiliHost.backend && (FiliHost.backend.keyNav = false); r.maskClicked(); } }
+    }
     Column {
-        anchors { left: thumb.visible ? thumb.right : eye.right; leftMargin: FiliTheme.space2 + 2; right: detailText.visible ? detailText.left : parent.right; rightMargin: FiliTheme.space2 + 2; verticalCenter: parent.verticalCenter }
+        anchors { left: maskThumb.visible ? maskThumb.right : thumb.visible ? thumb.right : eye.right; leftMargin: FiliTheme.space2 + 2; right: detailText.visible ? detailText.left : parent.right; rightMargin: FiliTheme.space2 + 2; verticalCenter: parent.verticalCenter }
         Text {
             width: parent.width
             text: r.label
