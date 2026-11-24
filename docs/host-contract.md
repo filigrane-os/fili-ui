@@ -15,6 +15,19 @@ them works with a bare backend.
 
 These are the functions every fili-* application already exposes the same way (`agents/skills/filigrane-ui/references/app-window.md`).
 
+## Button labels
+
+`FiliIconButton` and `FiliViewSwitch` do not draw their hover label (a Qt Quick Controls `ToolTip` costs about 3 MB per window
+process): they call `showTip(item, text)` and `hideTip(item)` on their **window**. The window defines both over a `FiliTooltip`:
+
+```qml
+function showTip(owner, text) { tooltip.show(owner, { text: text }); }
+function hideTip(owner) { tooltip.hide(owner); }
+FiliTooltip { id: tooltip }
+```
+
+Without them the buttons work but show no label.
+
 ## Layouts and sizes
 
 Components give an `implicitWidth` / `implicitHeight`, so they sit in a layout. The header and its `leading` / `tools` are

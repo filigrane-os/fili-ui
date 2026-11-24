@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
+
+What the six applications needed to leave their own copies (Cassette, Baladeur, Aeroport, Conversations, Facteur, Lia).
 
 - `FiliViewSwitch` takes any number of segments (`modes: [{ key, icon, tip }]`, icons of the kit; default still list / grid with drawn pictograms), a hover label per segment and the accent-band tints (`accented`, `ink`): where the reader goes in Facteur (automatic, right, below).
 
