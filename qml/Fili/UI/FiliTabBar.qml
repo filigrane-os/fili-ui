@@ -8,9 +8,13 @@
 //    its model). Keyboard: Ctrl+Shift+Left / Right.
 //  - close: the × that shows on hover and on the current tab, a middle click, or Delete; `closeRequested(index)`.
 //  - detach: drag it far from the bar (it turns half transparent) and release: `detachRequested(index)`, the owner makes a window of it.
+//  - many tabs: below 80 each the row scrolls with the wheel (`overflows`) and keeps the current tab in view.
 //  - also: `contextRequested(index, x, y)` on right click, `addRequested()` for the + button (`addable`), files dragged over a tab
 //    (`tabDropped(index, drop)`; hovering one for `springDelay` ms selects it, so the target can be chosen in the view).
-// model = [label, …] or [{ label, count }, …] (`count`: a muted figure after the label, such as unread messages).
+// model = [label, …] or [{ label, count, icon, iconColor, spin, closable }, …] (`count`: a muted figure after the label, such as unread
+// messages; `icon`: the name of a FiliIcon shown before the label, in `iconColor` (a colour, `textSecondary` by default), turning
+// while `spin` is true and the window is active: a command running, a conversation loading; `dots`: colours of small discs shown
+// before the label, such as the platforms of a conversation).
 // Tab and Left / Right choose a tab, Return or Space too.
 import QtQuick
 import QtQuick.Window
@@ -45,11 +49,32 @@ Rectangle {
     readonly property real tabWidth: Math.max(80, Math.min(maxTabWidth, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
     readonly property real slot: tabWidth + FiliTheme.space3
 
+    // More tabs than room (each tab keeps 80 at least): the wheel scrolls the row, and the current tab is brought into view
+    property real scrollX: 0
+    readonly property real viewWidth: width - 2 * FiliTheme.margin
+    readonly property real contentWidth: count * slot + addWidth
+    readonly property bool overflows: contentWidth - FiliTheme.space3 > viewWidth + 0.5
+    function clampScroll(v) { return Math.max(0, Math.min(v, Math.max(0, contentWidth - FiliTheme.space3 - viewWidth))); }
+    function showCurrent() {
+        if (!overflows) { scrollX = 0; return; }
+        const left = currentIndex * slot, right = left + tabWidth;
+        if (left < scrollX) scrollX = clampScroll(left);
+        else if (right > scrollX + viewWidth) scrollX = clampScroll(right - viewWidth);
+        else scrollX = clampScroll(scrollX);
+    }
+    onCurrentIndexChanged: showCurrent()
+    onWidthChanged: showCurrent()
+    onCountChanged: showCurrent()
+
     implicitHeight: FiliTheme.tabBarHeight
     color: FiliTheme.background
 
     function labelOf(m) { return typeof m === "string" ? m : m.label; }
     function countOf(m) { return typeof m === "string" ? "" : (m.count ?? ""); }
+    function dotsOf(m) { return typeof m === "string" ? [] : (m.dots ?? []); }
+    // A tab can opt out of closing (`closable: false`, such as the fixed categories of a mailbox)
+    function closableOf(m) { return bar.closable && (typeof m === "string" || m.closable !== false); }
+    function iconOf(m) { return typeof m === "string" ? "" : (m.icon ?? ""); }
     // Sideways shift of a tab that is not the picked one: it makes room for it
     function shiftOf(i) {
         if (dragFrom < 0 || i === dragFrom)
@@ -67,6 +92,12 @@ Rectangle {
         width: parent.width - 2 * FiliTheme.margin
         height: FiliTheme.tabHeight
         anchors.verticalCenter: parent.verticalCenter
+        clip: bar.overflows && bar.dragFrom < 0
+        WheelHandler {
+            enabled: bar.overflows
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: event => bar.scrollX = bar.clampScroll(bar.scrollX - (event.angleDelta.x !== 0 ? event.angleDelta.x : event.angleDelta.y))
+        }
         Repeater {
             id: rep
             model: bar.model
@@ -76,7 +107,7 @@ Rectangle {
                 required property int index
                 readonly property bool current: index === bar.currentIndex
                 readonly property bool picked: bar.dragFrom === index
-                x: index * bar.slot + (picked ? bar.dragDx : bar.shiftOf(index))
+                x: index * bar.slot - bar.scrollX + (picked ? bar.dragDx : bar.shiftOf(index))
                 width: bar.tabWidth
                 height: FiliTheme.tabHeight
                 radius: FiliTheme.radiusControl
@@ -102,7 +133,7 @@ Rectangle {
                     } else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) {
                         FiliHost.keyboard();
                         bar.tabClicked(index);
-                    } else if (e.key === Qt.Key_Delete && bar.closable) {
+                    } else if (e.key === Qt.Key_Delete && bar.closableOf(modelData)) {
                         FiliHost.keyboard();
                         bar.closeRequested(index);
                     } else {
@@ -130,9 +161,31 @@ Rectangle {
                         onTriggered: bar.tabClicked(tab.index)
                     }
                 }
+                FiliIcon {
+                    id: tabIcon
+                    visible: name !== ""
+                    anchors { left: parent.left; leftMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+                    name: bar.iconOf(tab.modelData)
+                    size: 12
+                    color: typeof tab.modelData === "object" && tab.modelData.iconColor ? tab.modelData.iconColor : FiliTheme.textSecondary
+                    RotationAnimator on rotation {
+                        running: typeof tab.modelData === "object" && !!tab.modelData.spin && !!Window.window && Window.window.active
+                        from: 0; to: 360; duration: 1400; loops: Animation.Infinite
+                    }
+                }
+                Row {
+                    id: tabDots
+                    visible: bar.dotsOf(tab.modelData).length > 0
+                    anchors { left: parent.left; leftMargin: FiliTheme.space3; verticalCenter: parent.verticalCenter }
+                    spacing: 2
+                    Repeater {
+                        model: bar.dotsOf(tab.modelData)
+                        Rectangle { required property string modelData; width: 8; height: 8; radius: 4; color: modelData }
+                    }
+                }
                 Text {
                     id: label
-                    anchors { left: parent.left; leftMargin: FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
+                    anchors { left: tabDots.visible ? tabDots.right : tabIcon.visible ? tabIcon.right : parent.left; leftMargin: tabDots.visible || tabIcon.visible ? FiliTheme.space2 : FiliTheme.space4; right: countText.visible ? countText.left : closeX.left; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
                     text: bar.labelOf(tab.modelData)
                     elide: Text.ElideRight
                     font.family: FiliTheme.font
@@ -205,7 +258,7 @@ Rectangle {
                             return;
                         }
                         if (e.button === Qt.MiddleButton) {
-                            if (bar.closable)
+                            if (bar.closableOf(tab.modelData))
                                 bar.closeRequested(tab.index);
                         } else if (e.button === Qt.RightButton) {
                             const p = area.mapToItem(null, e.x, e.y);
@@ -219,7 +272,7 @@ Rectangle {
                 // The ×: on hover and on the current tab
                 Text {
                     id: closeX
-                    visible: bar.closable && (area.containsMouse || xHit.containsMouse || tab.current)
+                    visible: bar.closableOf(tab.modelData) && (area.containsMouse || xHit.containsMouse || tab.current)
                     anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
                     text: "×"
                     font.pixelSize: 16
@@ -238,7 +291,7 @@ Rectangle {
         // The + button after the last tab
         Rectangle {
             visible: bar.addable
-            x: bar.count * bar.slot
+            x: bar.count * bar.slot - bar.scrollX
             width: 28
             height: FiliTheme.tabHeight
             radius: FiliTheme.radiusControl

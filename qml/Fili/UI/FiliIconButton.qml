@@ -2,7 +2,7 @@
 // applications: font glyph (`glyph`, `size`), toggle state, accent band (`accented` + `ink`), accessible name (`tip`).
 // The hover label is NOT drawn here: Qt Quick Controls' ToolTip costs ~3 MB per window process. The window draws it
 // (`showTip(item, text)` / `hideTip(item)` on the Window), as fili-term does; `hint` is the key shown after the name.
-// Line icons (Icon.qml of the apps) are not in the kit yet: see docs/inventory.md.
+// A line icon (`name`, FiliIcon) or a font glyph (`glyph`).
 import QtQuick
 import QtQuick.Window
 
@@ -10,6 +10,11 @@ Rectangle {
     id: b
     property string glyph
     property int size: 14
+    // A line icon of the kit (FiliIcon, `name` is one of its keys) instead of a font glyph; `filled` also fills the shape
+    // (starred), `iconSize` is its size
+    property string name
+    property bool filled: false
+    property int iconSize: 16
     property string tip
     property string hint
     property bool enabledState: true
@@ -28,7 +33,16 @@ Rectangle {
     Accessible.role: Accessible.Button
     Accessible.name: tip
 
+    FiliIcon {
+        visible: b.name !== ""
+        anchors.centerIn: parent
+        name: b.name
+        filled: b.filled
+        size: b.iconSize
+        color: b.accented ? b.ink : b.enabledState ? FiliTheme.text : FiliTheme.muted
+    }
     Text {
+        visible: b.name === ""
         anchors.centerIn: parent
         text: b.glyph
         font.family: FiliTheme.icons
