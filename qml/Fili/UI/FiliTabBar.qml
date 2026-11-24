@@ -41,7 +41,8 @@ Rectangle {
     readonly property int count: model.length
     readonly property int addWidth: addable ? 28 + FiliTheme.space3 : 0
     // Equal widths, like Casier's tabs: the row shrinks to 80 before it overflows
-    readonly property real tabWidth: Math.max(80, Math.min(180, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
+    property real maxTabWidth: 180
+    readonly property real tabWidth: Math.max(80, Math.min(maxTabWidth, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
     readonly property real slot: tabWidth + FiliTheme.space3
 
     implicitHeight: FiliTheme.tabBarHeight
