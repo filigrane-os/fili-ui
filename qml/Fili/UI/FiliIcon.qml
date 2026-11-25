@@ -1,5 +1,5 @@
 // Line icon (24x24 grid, 2px stroke, round ends) drawn from an SVG path, so it scales and follows the theme colors.
-// name: one of the keys of `paths` (81 icons: the union of what Facteur, Conversations and Aeroport used).
+// name: one of the keys of `paths` (91 icons: the union of what Facteur, Conversations and Aeroport used).
 // To add one, copy its path from lucide.dev (24x24 grid) into `paths`. filled: the shape is also filled (starred).
 import QtQuick
 import QtQuick.Shapes
@@ -106,7 +106,17 @@ Item {
         "tabs": "M3 9h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M3 9V6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v3 M16 4h2a2 2 0 0 1 2 2v3",
         "mic": "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v3",
         "send": "m22 2-7 20-4-9-9-4z M22 2 11 13",
-        "smile": "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M8 14s1.5 2 4 2 4-2 4-2 M9 9h.01 M15 9h.01"
+        "smile": "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M8 14s1.5 2 4 2 4-2 4-2 M9 9h.01 M15 9h.01",
+        "bold": "M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8",
+        "italic": "M19 4h-9 M14 20H5 M15 4 9 20",
+        "underline": "M6 4v6a6 6 0 0 0 12 0V4 M4 20h16",
+        "strikethrough": "M16 4H9a3 3 0 0 0-2.83 4 M14 12a4 4 0 0 1 0 8H6 M4 12h16",
+        "align-left": "M21 5H3 M15 12H3 M17 19H3",
+        "align-center": "M21 5H3 M17 12H7 M19 19H5",
+        "align-right": "M21 5H3 M21 12H9 M21 19H7",
+        "align-justify": "M3 5h18 M3 12h18 M3 19h18",
+        "swap": "M8 3 4 7l4 4 M4 7h16 M16 21l4-4-4-4 M20 17H4",
+        "reset": "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5"
     })
 
     Shape {
