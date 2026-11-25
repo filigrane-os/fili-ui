@@ -46,8 +46,8 @@ Rectangle {
         font.family: FiliTheme.font
         font.pixelSize: FiliTheme.sizeList
         color: FiliTheme.text
-        selectionColor: FiliTheme.accentColor
-        selectedTextColor: FiliTheme.background
+        selectionColor: FiliTheme.selectionText
+        selectedTextColor: FiliTheme.text
         selectByMouse: true
         readOnly: f.readOnly
         inputMethodHints: f.inputMethodHints

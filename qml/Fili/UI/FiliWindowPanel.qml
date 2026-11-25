@@ -265,7 +265,7 @@ Item {
                                 height: panel.tileH
                                 opacity: panel.active.length >= 0 && panel.enabledItem(modelData) ? 1 : 0.4
                                 radius: FiliTheme.radiusControl
-                                color: tileArea.pressed ? FiliTheme.surfaceActive : tile.selected ? FiliTheme.surfaceHover : tile.on ? FiliTheme.alpha(FiliTheme.accentColor, 0.22) : "transparent"
+                                color: tileArea.pressed ? FiliTheme.selectionPressed : tile.selected ? FiliTheme.selectionHover : tile.on ? FiliTheme.selection : "transparent"
                                 border.width: tile.selected ? 1 : 0
                                 border.color: FiliTheme.accentColor
                                 Column {

@@ -33,7 +33,7 @@ Item {
     Rectangle {
         anchors { fill: parent; topMargin: 1; bottomMargin: 1; leftMargin: FiliTheme.space2 + 2; rightMargin: FiliTheme.space2 + 2 }
         radius: FiliTheme.radiusControl
-        color: r.selected || area.containsMouse || eyeArea.containsMouse ? FiliTheme.surfaceHover : "transparent"
+        color: r.selected ? (area.containsMouse || eyeArea.containsMouse ? FiliTheme.selectionHover : FiliTheme.selection) : area.containsMouse || eyeArea.containsMouse ? FiliTheme.hoverFill : "transparent"
         FocusRing { gap: 0 }
     }
     MouseArea {
@@ -103,7 +103,7 @@ Item {
             elide: Text.ElideRight
             font.family: FiliTheme.font
             font.pixelSize: FiliTheme.size
-            color: !r.layerVisible ? FiliTheme.muted : r.selected ? FiliTheme.accentColor : FiliTheme.text
+            color: !r.layerVisible ? FiliTheme.muted : FiliTheme.text
         }
         Text {
             visible: r.subtitle !== ""
@@ -122,6 +122,6 @@ Item {
         text: r.detail
         font.family: FiliTheme.font
         font.pixelSize: FiliTheme.sizeSmall
-        color: FiliTheme.muted
+        color: FiliTheme.text
     }
 }

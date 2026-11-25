@@ -28,6 +28,7 @@ FiliDock 1.0 FiliDock.qml
 FiliCurveEditor 1.0 FiliCurveEditor.qml
 FiliTabBar 1.0 FiliTabBar.qml
 FiliViewSwitch 1.0 FiliViewSwitch.qml
+FiliWindowButton 1.0 FiliWindowButton.qml
 FiliWindowPanel 1.0 FiliWindowPanel.qml
 FiliLiaButton 1.0 FiliLiaButton.qml
 FiliDebugPanel 1.0 FiliDebugPanel.qml

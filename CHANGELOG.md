@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0
+
+A softer selection, a standard dialog and a window button.
+
+- Selection is a translucent wash of the accent (`FiliTheme.selection`, `selectionHover`, `selectionPressed`, `selectionText`,
+  `hoverFill`) instead of opaque grey steps: `FiliTabBar` (plus a 2 px accent line under the current tab), `FiliSidebarRow`,
+  `FiliLayerRow`, the tiles of `FiliWindowPanel`, text selection of `FiliTextField` and `FiliDebugPanel`. The text of a selected row
+  stays in the text colour. The detail of a `FiliLayerRow` (80 %) is in the text colour, not muted.
+- `FiliDialog`: a × at the top right on every dialog (`closeButton`, on by default; the About card has it too), `actions` for the extra
+  buttons left of Cancel (Join Teams, Edit), `showConfirm: false` for a card with no main action (Enter closes), more room between
+  the content and the buttons.
+- `FiliWindowButton`: the Window button of a header. A click toggles the maximized column (niri's Mod+F, Qt's maximize elsewhere),
+  the glyph (`window` / `window-maximized`) shows the state, one second of hover opens the `FiliWindowPanel`, a right click opens it at once.
+- `FiliButton.iconName`: an icon before the label ("New", "Add"), instead of a "+" typed in the label.
+
 ## 0.5.0
 
 The parts of an image editor around its canvas (fili-photocraft), which does not use the sidebar of the usual window.

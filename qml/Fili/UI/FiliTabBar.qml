@@ -113,7 +113,7 @@ Rectangle {
                 radius: FiliTheme.radiusControl
                 z: picked ? 10 : 0
                 opacity: picked && bar.leaving ? 0.45 : picked ? 0.9 : 1
-                color: current ? FiliTheme.surfaceActive : area.containsMouse || drop.containsDrag ? FiliTheme.surfaceHover : "transparent"
+                color: current ? FiliTheme.selection : area.containsMouse || drop.containsDrag ? FiliTheme.hoverFill : "transparent"
                 border.width: drop.containsDrag ? 1 : 0
                 border.color: FiliTheme.accentColor
                 activeFocusOnTab: true
@@ -182,6 +182,14 @@ Rectangle {
                         model: bar.dotsOf(tab.modelData)
                         Rectangle { required property string modelData; width: 8; height: 8; radius: 4; color: modelData }
                     }
+                }
+                // The current tab: a 2 px accent line under it carries the state, so its wash can stay faint
+                Rectangle {
+                    visible: tab.current
+                    anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: FiliTheme.radiusControl; rightMargin: FiliTheme.radiusControl }
+                    height: 2
+                    radius: 1
+                    color: FiliTheme.accentColor
                 }
                 Text {
                     id: label

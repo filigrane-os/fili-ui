@@ -84,6 +84,7 @@ Window {
         FiliIconButton { glyph: ""; tip: "Disabled"; enabledState: false }
         FiliViewSwitch { mode: win.view; onChose: m => win.view = m }
         FiliLiaButton {}
+        FiliWindowButton { panel: windowPanel }
         FiliTextField { placeholder: "Search"; clearable: true }
     }
     FiliSidebar {
@@ -176,6 +177,7 @@ Window {
                             FiliButton { label: "Default" }
                             FiliButton { label: "Primary"; primary: true }
                             FiliButton { label: "Disabled"; enabledState: false }
+                            FiliButton { label: "New"; iconName: "plus"; primary: true }
                             FiliButton { label: backend.light ? "Dark mode" : "Light mode"; onClicked: backend.light = !backend.light }
                         }
                     }
