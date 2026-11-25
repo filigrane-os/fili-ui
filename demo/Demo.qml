@@ -302,6 +302,7 @@ Window {
                 property var curve: [[0, 0], [64, 48], [192, 212], [255, 255]]
                 property int layersTab: 0
                 property int picked: 1
+                property bool maskPicked: false
                 property var shown: [true, true, true]
                 FiliOptionsBar {
                     id: optionsBar
@@ -370,16 +371,20 @@ Window {
                         onTabClicked: i => editor.layersTab = i
                         Column {
                             Repeater {
-                                model: [{ name: "Curves 1", kind: "Adjustment", opacity: "80 %" }, { name: "Title", kind: "Type", opacity: "" }, { name: "Background", kind: "Pixel", opacity: "" }]
+                                model: [{ name: "Curves 1", kind: "Adjustment", opacity: "80 %" }, { name: "Title", kind: "Type", opacity: "", mask: true }, { name: "Background", kind: "Pixel", opacity: "" }]
                                 FiliLayerRow {
                                     required property var modelData
                                     required property int index
                                     label: modelData.name
                                     subtitle: modelData.kind
                                     detail: modelData.opacity
+                                    // A layer mask: its picture beside the layer's; a click on it makes it the target of painting
+                                    maskThumbnail: modelData.mask ? "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><defs><linearGradient id='g'><stop offset='0' stop-color='black'/><stop offset='1' stop-color='white'/></linearGradient></defs><rect width='32' height='32' fill='url(%23g)'/></svg>" : ""
+                                    maskSelected: modelData.mask === true && editor.maskPicked
+                                    onMaskClicked: { editor.picked = index; editor.maskPicked = true; }
                                     selected: editor.picked === index
                                     layerVisible: editor.shown[index]
-                                    onClicked: editor.picked = index
+                                    onClicked: { editor.picked = index; editor.maskPicked = false; }
                                     onVisibilityToggled: shown => { const l = editor.shown.slice(); l[index] = shown; editor.shown = l; }
                                 }
                             }
