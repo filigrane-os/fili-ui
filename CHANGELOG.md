@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+- `FiliTextField`: a secret field has an eye at its right end that shows or hides the password (`revealable`, on by default;
+  `revealed`). The focus stays in the field; the text is hidden again when the field is hidden or `secret` changes.
+
 ## 0.6.0
 
 A softer selection, a standard dialog and a window button.
