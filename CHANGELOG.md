@@ -14,6 +14,8 @@ A softer selection, a standard dialog and a window button.
 - `FiliWindowButton`: the Window button of a header. A click toggles the maximized column (niri's Mod+F, Qt's maximize elsewhere),
   the glyph (`window` / `window-maximized`) shows the state, one second of hover opens the `FiliWindowPanel`, a right click opens it at once.
 - `FiliButton.iconName`: an icon before the label ("New", "Add"), instead of a "+" typed in the label.
+- `FiliTextField.suggestions`: a list under the field (strings or {label, detail, value}) while it has the focus, ↑ ↓ Enter Esc and
+  click; `textEdited` and `suggestionPicked(item)` for the owner (a place, an address, a contact). `FiliSelect` uses the new selection.
 
 ## 0.5.0
 
