@@ -34,6 +34,7 @@ fn main() {
         "FiliTabBar",
         "FiliViewSwitch",
         "FiliWindowPanel",
+        "FiliWindowButton",
         "FiliLiaButton",
         "FiliDebugPanel",
         "FiliMenu",
