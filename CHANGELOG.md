@@ -4,6 +4,7 @@
 
 - A stronger selection: the accent wash of a selected row, tab or tile is twice as dense (28 % instead of 14 %, hover 34 %,
   pressed 40 %, selected text 45 %), so it reads at a glance in both modes.
+- `FiliIcon`: a `calendar` icon (an invitation in Facteur).
 
 ## 0.7.0
 
