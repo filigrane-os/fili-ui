@@ -1,5 +1,5 @@
 // Line icon (24x24 grid, 2px stroke, round ends) drawn from an SVG path, so it scales and follows the theme colors.
-// name: one of the keys of `paths` (91 icons: the union of what Facteur, Conversations and Aeroport used).
+// name: one of the keys of `paths` (92 icons: the union of what Facteur, Conversations and Aeroport used).
 // To add one, copy its path from lucide.dev (24x24 grid) into `paths`. filled: the shape is also filled (starred).
 import QtQuick
 import QtQuick.Shapes
@@ -89,6 +89,7 @@ Item {
         "check": "M20 6L9 17l-5-5",
         "chevron-up": "M18 15l-6-6-6 6",
         "chevron-down": "M6 9l6 6 6-6",
+        "calendar": "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M16 2v4 M8 2v4 M3 10h18",
         "download": "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3",
         "refresh": "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8 M21 3v5h-5 M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16 M8 16H3v5",
         "compose": "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.4 2.6a2 2 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.9.85a.5.5 0 0 1-.62-.62l.85-2.9a2 2 0 0 1 .5-.85z",
