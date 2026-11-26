@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1
+
+- A stronger selection: the accent wash of a selected row, tab or tile is twice as dense (28 % instead of 14 %, hover 34 %,
+  pressed 40 %, selected text 45 %), so it reads at a glance in both modes.
+
 ## 0.7.0
 
 - `FiliTextField`: a secret field has an eye at its right end that shows or hides the password (`revealable`, on by default;
