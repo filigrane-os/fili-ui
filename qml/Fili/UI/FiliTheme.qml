@@ -30,6 +30,13 @@ QtObject {
     readonly property color text: m.text
     readonly property color warning: m.warning
     readonly property color danger: m.danger
+    // Selection: a translucent wash of the accent over whatever is behind, so it follows the accent and the mode and never
+    // jumps a full luminosity step. Hover is a faint wash of the text colour; selected + hover is a little stronger.
+    readonly property color hoverFill: alpha(text, 0.06)
+    readonly property color selection: alpha(accentColor, 0.14)
+    readonly property color selectionHover: alpha(accentColor, 0.18)
+    readonly property color selectionPressed: alpha(accentColor, 0.22)
+    readonly property color selectionText: alpha(accentColor, 0.35)
     function alpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a);
     }

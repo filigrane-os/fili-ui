@@ -123,7 +123,7 @@ Rectangle {
                         width: rows.width
                         height: 26
                         radius: FiliTheme.radiusControl
-                        color: index === sel.cursor || rowArea.containsMouse ? FiliTheme.surfaceHover : "transparent"
+                        color: index === sel.cursor ? FiliTheme.selection : rowArea.containsMouse ? FiliTheme.hoverFill : "transparent"
                         opacity: modelData.off ? 0.4 : 1
                         Text {
                             anchors { left: parent.left; leftMargin: FiliTheme.space2; right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }

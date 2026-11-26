@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.6.0
+
+A softer selection, a standard dialog and a window button.
+
+- Selection is a translucent wash of the accent (`FiliTheme.selection`, `selectionHover`, `selectionPressed`, `selectionText`,
+  `hoverFill`) instead of opaque grey steps: `FiliTabBar` (plus a 2 px accent line under the current tab), `FiliSidebarRow`,
+  `FiliLayerRow`, the tiles of `FiliWindowPanel`, text selection of `FiliTextField` and `FiliDebugPanel`. The text of a selected row
+  stays in the text colour. The detail of a `FiliLayerRow` (80 %) is in the text colour, not muted.
+- `FiliDialog`: a × at the top right on every dialog (`closeButton`, on by default; the About card has it too), `actions` for the extra
+  buttons left of Cancel (Join Teams, Edit), `showConfirm: false` for a card with no main action (Enter closes), more room between
+  the content and the buttons.
+- `FiliWindowButton`: the Window button of a header. A click toggles the maximized column (niri's Mod+F, Qt's maximize elsewhere),
+  the glyph (`window` / `window-maximized`) shows the state, one second of hover opens the `FiliWindowPanel`, a right click opens it at once.
+- `FiliButton.iconName`: an icon before the label ("New", "Add"), instead of a "+" typed in the label.
+- `FiliTextField.suggestions`: a list under the field (strings or {label, detail, value}) while it has the focus, ↑ ↓ Enter Esc and
+  click; `textEdited` and `suggestionPicked(item)` for the owner (a place, an address, a contact). `FiliSelect` uses the new selection.
+
+## 0.5.0
+
+The parts of an image editor around its canvas (fili-photocraft), which does not use the sidebar of the usual window.
+
+- `FiliToolStrip`: the column of tools (44 wide), separators between the groups, the current tool in the accent colour, a corner mark
+  for a tool with variants, a hover label drawn by the window, the foreground and background colours at the bottom.
+- `FiliOptionsBar`: the band under the top edge (options of the current tool, `trailing`, close button as `FiliHeader` has it).
+- `FiliDock` and `FiliDockGroup`: the column of panels on the right, resizable by its left edge, each group a row of text tabs and the
+  panel of the current tab (Properties / Adjustments, Layers / Channels / Paths).
+- `FiliCurveEditor`: the graph of the Curves adjustment (add, drag, remove points, arrows, the engine's own `samples` drawn between
+  them, an optional histogram behind).
+- `FiliLayerRow` (new in this release, with the eye icons): a `subtitle` (the kind of layer) under the name, a `thumbnail` and the picture of the layer mask (`maskThumbnail`, `maskSelected`, `maskClicked`).
+- `FiliIcon`: the tool icons of an editor (move, marquee, lasso, crop, pipette, brush, stamp, eraser, paint bucket, pen, type, path
+  selection, square, hand, zoom, layers, sliders, history, palette, compass…), 81 in all.
+- The demo has an Editor page with all of it.
+
+- `FiliTabBar.maxTabWidth` (180 by default): an editor whose tab carries the zoom and the mode lets it grow.
+- `FiliIcon`: also pencil, droplet, triangle, pointer, sun, moon, sponge, bandage, circle, wand, gradient, star, hexagon.
+
 ## 0.4.0
 
 What the six applications needed to leave their own copies (Cassette, Baladeur, Aeroport, Conversations, Facteur, Lia).

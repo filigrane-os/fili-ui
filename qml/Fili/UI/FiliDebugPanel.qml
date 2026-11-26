@@ -204,8 +204,8 @@ Rectangle {
             font.family: FiliTheme.mono
             font.pixelSize: FiliTheme.sizeSmall
             color: FiliTheme.textSecondary
-            selectionColor: FiliTheme.accentColor
-            selectedTextColor: "white"
+            selectionColor: FiliTheme.selectionText
+            selectedTextColor: FiliTheme.text
         }
     }
     FiliScrollBar {

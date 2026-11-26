@@ -45,7 +45,8 @@ Rectangle {
     readonly property int count: model.length
     readonly property int addWidth: addable ? 28 + FiliTheme.space3 : 0
     // Equal widths, like Casier's tabs: the row shrinks to 80 before it overflows
-    readonly property real tabWidth: Math.max(80, Math.min(180, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
+    property real maxTabWidth: 180
+    readonly property real tabWidth: Math.max(80, Math.min(maxTabWidth, (width - 2 * FiliTheme.margin - addWidth) / Math.max(1, count) - FiliTheme.space3))
     readonly property real slot: tabWidth + FiliTheme.space3
 
     // More tabs than room (each tab keeps 80 at least): the wheel scrolls the row, and the current tab is brought into view
@@ -112,7 +113,7 @@ Rectangle {
                 radius: FiliTheme.radiusControl
                 z: picked ? 10 : 0
                 opacity: picked && bar.leaving ? 0.45 : picked ? 0.9 : 1
-                color: current ? FiliTheme.surfaceActive : area.containsMouse || drop.containsDrag ? FiliTheme.surfaceHover : "transparent"
+                color: current ? FiliTheme.selection : area.containsMouse || drop.containsDrag ? FiliTheme.hoverFill : "transparent"
                 border.width: drop.containsDrag ? 1 : 0
                 border.color: FiliTheme.accentColor
                 activeFocusOnTab: true
@@ -181,6 +182,14 @@ Rectangle {
                         model: bar.dotsOf(tab.modelData)
                         Rectangle { required property string modelData; width: 8; height: 8; radius: 4; color: modelData }
                     }
+                }
+                // The current tab: a 2 px accent line under it carries the state, so its wash can stay faint
+                Rectangle {
+                    visible: tab.current
+                    anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: FiliTheme.radiusControl; rightMargin: FiliTheme.radiusControl }
+                    height: 2
+                    radius: 1
+                    color: FiliTheme.accentColor
                 }
                 Text {
                     id: label

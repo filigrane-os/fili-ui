@@ -40,6 +40,10 @@ Canvas {
         case "window":
             box(2.5, 2.5, 11, 11);
             break;
+        case "window-maximized":
+            box(2.5, 2.5, 11, 11);
+            line(8, 2.5, 8, 13.5);
+            break;
         case "minimize":
             box(1.5, 2.5, 13, 11);
             line(4.5, 10.5, 11.5, 10.5);

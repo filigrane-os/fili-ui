@@ -3,7 +3,7 @@
 Shared QML controls and tokens for the Filigrane applications (`fili-*`), following the Filigrane desktop HIG
 (`agents/skills/filigrane-ui/` in the Filigrane repository).
 
-Status: 0.3.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit and `docs/host-contract.md` for what an application gives it.
+Status: 0.4.0. See `docs/inventory.md` for what the applications copied by hand and `docs/adoption.md` to use the kit and `docs/host-contract.md` for what an application gives it.
 
 | Part | Components |
 |---|---|
@@ -14,7 +14,8 @@ Status: 0.3.0. See `docs/inventory.md` for what the applications copied by hand 
 | Dialogs, menus, cards | `FiliDialog`, `FiliMenu` (context menu with submenus), `FiliAboutCard`, `FiliShortcutsCard` |
 | Window actions, assistant, logs | `FiliWindowPanel`, `FiliLiaButton`, `FiliDebugPanel` |
 | Shell cards | `FiliTooltip` (`FiliTooltipCard`), `FiliPanel` (`FiliPanelSection`, `FiliPanelButton`), `FiliSettings` |
-| Pictures, icons, loader | `FiliIcon` (50 line icons), `FiliAvatar`, `FiliSpinner` (the logo's veils) |
+| Pictures, icons, loader | `FiliIcon` (81 line icons), `FiliAvatar`, `FiliSpinner` (the logo's veils) |
+| Image editor | `FiliToolStrip` (tools and colours), `FiliOptionsBar`, `FiliDock` with `FiliDockGroup` (tabbed panels), `FiliCurveEditor` (the Curves graph), `FiliLayerRow` (eye, thumbnail, kind) |
 | Window anatomy | `FiliHeader`, `FiliNavCapsule`, `FiliSidebar`, `FiliSidebarSection`, `FiliSidebarRow`, `FiliTabBar`, `FiliFooter` |
 | Scrolling, focus, window actions | `KineticScroll`, `FiliScrollBar`, `FocusRing`, `WindowGlyph` |
 

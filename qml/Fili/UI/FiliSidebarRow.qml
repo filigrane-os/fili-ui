@@ -27,7 +27,7 @@ Item {
         id: bg
         anchors { fill: parent; topMargin: 1; bottomMargin: 1; leftMargin: FiliTheme.space2 + 2; rightMargin: FiliTheme.space2 + 2 }
         radius: FiliTheme.radiusControl
-        color: r.selected || area.containsMouse ? FiliTheme.surfaceHover : "transparent"
+        color: r.selected ? (area.containsMouse ? FiliTheme.selectionHover : FiliTheme.selection) : area.containsMouse ? FiliTheme.hoverFill : "transparent"
         FocusRing { gap: 0 }
     }
     Item {
@@ -57,7 +57,7 @@ Item {
         elide: Text.ElideRight
         font.family: FiliTheme.font
         font.pixelSize: FiliTheme.size
-        color: r.selected ? FiliTheme.accentColor : FiliTheme.text
+        color: FiliTheme.text
     }
     Text {
         id: countText

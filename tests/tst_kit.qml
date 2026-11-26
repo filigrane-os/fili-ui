@@ -1,5 +1,6 @@
 // Behaviour of the controls and of the window anatomy, headless (QT_QPA_PLATFORM=offscreen, see scripts/run-tests.sh).
 import QtQuick
+import QtQuick.Layouts
 import QtTest
 import Fili.UI
 
@@ -47,6 +48,28 @@ Item {
                 FiliSidebarRow { label: "Pictures" }
             }
         }
+        FiliLayerRow { id: layerRow; width: 200; label: "Curves"; detail: "80 %"; onVisibilityToggled: shown => layerVisible = shown }
+        FiliToolStrip {
+            id: toolStrip
+            height: 300
+            model: [{ id: "move", icon: "move", tip: "Move" }, { sep: true }, { id: "brush", icon: "brush", tip: "Brush", variants: true }, { id: "hand", icon: "hand", tip: "Hand" }]
+            current: "move"
+        }
+        FiliOptionsBar { id: optionsBar; width: 400; closeButton: true; FiliCheckBox { id: optionsCheck; label: "Auto" } }
+        FiliDock {
+            id: dock
+            height: 240
+            FiliDockGroup {
+                id: dockGroup
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                tabs: ["One", "Two", "Three"]
+                Rectangle { id: panelOne; color: "red" }
+                Rectangle { id: panelTwo; color: "green" }
+                Rectangle { id: panelThree; color: "blue" }
+            }
+        }
+        FiliCurveEditor { id: curveEditor; width: 200; height: 200 }
         FiliTabBar { id: tabs; width: 400; model: ["A", "B", { label: "C", count: "3" }]; addable: true }
         FiliTabBar { id: iconTabs; width: 400; model: ["A", { label: "B", icon: "check", iconColor: "#ff0000" }, { label: "C", icon: "refresh", spin: true }, { label: "D", dots: ["#ff0000", "#00ff00"] }] }
         FiliIconButton { id: lineIcon; name: "search"; filled: true }
@@ -90,6 +113,10 @@ Item {
     SignalSpy { id: clearedSpy; target: tf; signalName: "cleared" }
     SignalSpy { id: pickedSpy; target: se; signalName: "picked" }
     SignalSpy { id: rowSpy; target: row1; signalName: "clicked" }
+    SignalSpy { id: layerSpy; target: layerRow; signalName: "clicked" }
+    SignalSpy { id: toolSpy; target: toolStrip; signalName: "picked" }
+    SignalSpy { id: curveSpy; target: curveEditor; signalName: "pointsCommitted" }
+    SignalSpy { id: optionsCloseSpy; target: optionsBar; signalName: "closeRequested" }
     SignalSpy { id: tabSpy; target: tabs; signalName: "tabClicked" }
     SignalSpy { id: orderSpy; target: tabs; signalName: "reordered" }
     SignalSpy { id: closeSpy; target: tabs; signalName: "closeRequested" }
@@ -243,6 +270,91 @@ Item {
             const p = center(row1);
             mouseClick(root, p.x, p.y);
             compare(rowSpy.count, 1);
+        }
+        function test_layer_row_selects_and_its_eye_only_toggles() {
+            layerSpy.clear();
+            layerRow.layerVisible = true;
+            const p = layerRow.mapToItem(root, layerRow.width / 2, layerRow.height / 2);
+            mouseClick(root, p.x, p.y);
+            compare(layerSpy.count, 1, "a click on the row selects");
+            const e = layerRow.mapToItem(root, FiliTheme.margin + 8, layerRow.height / 2);
+            mouseClick(root, e.x, e.y);
+            compare(layerRow.layerVisible, false, "the eye hides the layer");
+            compare(layerSpy.count, 1, "the eye does not select");
+        }
+        function test_tool_strip_picks_a_tool_and_ignores_separators() {
+            toolSpy.clear();
+            const cell = i => toolStrip.children[1].children[i];   // children[0] is the border line, [1] the column of tools
+            const c = cell(2).mapToItem(root, 16, 16);
+            mouseClick(root, c.x, c.y);
+            compare(toolSpy.count, 1);
+            compare(toolSpy.signalArguments[0][0], "brush");
+            const s = cell(1).mapToItem(root, 16, 4);
+            mouseClick(root, s.x, s.y);
+            compare(toolSpy.count, 1, "a separator picks nothing");
+        }
+        function test_options_bar_closes_and_lays_out_its_options() {
+            optionsCloseSpy.clear();
+            const p = optionsBar.mapToItem(root, optionsBar.width - 14 - (optionsBar.height - 24) / 2, optionsBar.height / 2);
+            mouseClick(root, p.x, p.y);
+            compare(optionsCloseSpy.count, 1);
+            verify(optionsCheck.mapToItem(optionsBar, 0, 0).x >= FiliTheme.margin, "options start at the margin");
+        }
+        function test_dock_group_shows_only_the_current_panel_and_fills() {
+            compare(panelOne.visible, true);
+            compare(panelTwo.visible, false);
+            compare(panelThree.visible, false);
+            dockGroup.currentIndex = 2;
+            compare(panelOne.visible, false);
+            compare(panelThree.visible, true);
+            verify(panelThree.width === dockGroup.width && panelThree.height > 0, "the panel fills the group");
+            dockGroup.currentIndex = 0;
+        }
+        function test_dock_is_resized_by_its_edge_within_its_limits() {
+            const w0 = dock.width;
+            const e = dock.mapToItem(root, 2, 100);
+            mousePress(root, e.x, e.y);
+            mouseMove(root, e.x - 60, e.y);
+            mouseRelease(root, e.x - 60, e.y);
+            compare(dock.dockWidth, Math.min(dock.maxWidth, w0 + 60));
+            const e2 = dock.mapToItem(root, 2, 100);   // the edge has moved with the new width
+            mousePress(root, e2.x, e2.y);
+            mouseMove(root, e2.x + 1000, e2.y);
+            mouseRelease(root, e2.x + 1000, e2.y);
+            compare(dock.dockWidth, dock.minWidth);
+        }
+        function test_curve_editor_adds_moves_and_removes_points() {
+            curveSpy.clear();
+            curveEditor.points = [[0, 0], [255, 255]];
+            const at = (vx, vy) => curveEditor.mapToItem(root, vx / 255 * 200, 200 - vy / 255 * 200);
+            // A click in the middle of the graph adds a point there
+            let p = at(128, 192);
+            mousePress(root, p.x, p.y);
+            mouseRelease(root, p.x, p.y);
+            compare(curveSpy.count, 1);
+            let pts = curveSpy.signalArguments[0][0];
+            compare(pts.length, 3);
+            compare(pts[1][0], 128);
+            verify(Math.abs(pts[1][1] - 192) <= 2, "the point is where the pointer was");
+            curveEditor.points = pts;
+            // Dragging it moves it, and it cannot pass its neighbour
+            p = at(128, 192);
+            mousePress(root, p.x, p.y);
+            mouseMove(root, p.x + 500, p.y - 500);
+            mouseRelease(root, p.x + 500, p.y - 500);
+            pts = curveSpy.signalArguments[curveSpy.count - 1][0];
+            compare(pts[1][0], 254);
+            compare(pts[1][1], 255);
+            curveEditor.points = pts;
+            // Double click removes it, the two ends stay
+            p = at(254, 255);
+            mouseDoubleClickSequence(root, p.x, p.y);
+            pts = curveSpy.signalArguments[curveSpy.count - 1][0];
+            compare(pts.length, 2);
+            curveEditor.points = pts;
+            p = at(0, 0);
+            mouseDoubleClickSequence(root, p.x, p.y);
+            compare(curveEditor.drawn.length, 2, "a curve keeps its two ends");
         }
         // The tabs are the Repeater's items in the strip (the first child of the bar)
         function tabItem(i) { return tabs.children[0].children[i]; }
