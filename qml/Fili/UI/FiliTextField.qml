@@ -13,8 +13,13 @@ Rectangle {
     property bool clearable: false
     property bool enabledState: true
     property bool error: false
-    // Dots instead of the text (passwords); the × stays off
+    // Dots instead of the text (passwords); the × stays off. An eye at the right end shows or hides the text (`revealable`,
+    // on by default); `revealed` is its state, back to hidden when the field is hidden or `secret` changes.
     property bool secret: false
+    property bool revealable: true
+    property bool revealed: false
+    onSecretChanged: revealed = false
+    onVisibleChanged: if (!visible) revealed = false
     // Shown but not editable (an address); the keyboard hints of the field (an e-mail address, digits); the field Tab goes to
     property bool readOnly: false
     property int inputMethodHints: Qt.ImhNone
@@ -57,7 +62,7 @@ Rectangle {
 
     TextInput {
         id: input
-        anchors { left: parent.left; right: x.visible ? x.left : parent.right; leftMargin: FiliTheme.space2; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
+        anchors { left: parent.left; right: x.visible ? x.left : eye.visible ? eye.left : parent.right; leftMargin: FiliTheme.space2; rightMargin: FiliTheme.space1; verticalCenter: parent.verticalCenter }
         enabled: f.enabledState
         clip: true
         font.family: FiliTheme.font
@@ -69,7 +74,7 @@ Rectangle {
         readOnly: f.readOnly
         inputMethodHints: f.inputMethodHints
         KeyNavigation.tab: f.tabNext
-        echoMode: f.secret ? TextInput.Password : TextInput.Normal
+        echoMode: f.secret && !f.revealed ? TextInput.Password : TextInput.Normal
         activeFocusOnTab: true
         onAccepted: f.accepted()
         onTextEdited: f.textEdited()
@@ -107,6 +112,25 @@ Rectangle {
             anchors { fill: parent; margins: -6 }
             hoverEnabled: true
             onClicked: { f.clear(); input.forceActiveFocus(); }
+        }
+    }
+    // Show / hide a secret (eye open: the text is hidden, a click shows it); the focus stays in the field
+    FiliIcon {
+        id: eye
+        visible: f.secret && f.revealable
+        anchors { right: parent.right; rightMargin: FiliTheme.space2; verticalCenter: parent.verticalCenter }
+        name: f.revealed ? "eye-off" : "eye"
+        size: 14
+        color: eyeArea.containsMouse ? FiliTheme.text : FiliTheme.muted
+        Accessible.role: Accessible.Button
+        Accessible.name: f.revealed ? "Hide password" : "Show password"
+        MouseArea {
+            id: eyeArea
+            anchors { fill: parent; margins: -6 }
+            enabled: f.enabledState
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: { f.revealed = !f.revealed; input.forceActiveFocus(); }
         }
     }
     // The list of suggestions, over the whole window (a dialog or a card does not clip it)

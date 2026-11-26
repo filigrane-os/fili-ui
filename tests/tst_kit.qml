@@ -214,6 +214,30 @@ Item {
             compare(input.inputMethodHints, Qt.ImhDigitsOnly);
             tfSecret.inputMethodHints = Qt.ImhNone;
         }
+        function test_the_eye_of_a_secret_field_shows_and_hides_the_text() {
+            const input = tfSecret.children[0];
+            const eye = tfSecret.children[2];
+            tfSecret.visible = true;
+            wait(20);
+            compare(eye.visible, true, "an eye on a secret");
+            compare(eye.name, "eye");
+            const p = eye.mapToItem(root, eye.width / 2, eye.height / 2);
+            mouseClick(root, p.x, p.y);
+            compare(tfSecret.revealed, true);
+            compare(input.echoMode, TextInput.Normal, "the text shows");
+            compare(eye.name, "eye-off");
+            compare(input.activeFocus, true, "the focus stays in the field");
+            mouseClick(root, p.x, p.y);
+            compare(input.echoMode, TextInput.Password, "hidden again");
+            mouseClick(root, p.x, p.y);
+            tfSecret.visible = false;
+            compare(tfSecret.revealed, false, "hidden when the field goes away");
+            compare(input.echoMode, TextInput.Password);
+            tfSecret.revealable = false;
+            compare(eye.visible, false);
+            tfSecret.revealable = true;
+            compare(tf.children[2].visible, false, "no eye on a plain field");
+        }
         function test_many_tabs_scroll_and_keep_the_current_one_in_view() {
             verify(manyTabs.overflows, "8 tabs of 80 do not fit in 300");
             compare(manyTabs.scrollX, 0);
